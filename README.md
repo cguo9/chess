@@ -11,7 +11,7 @@
 -   [ ] Do testing in [main.c](main.c) to test each of your function implementations.
 -   [ ] Additionally, you can use [librefimpl.so](librefimpl.so) and [test.c](test.c) to get the correct output for any inputs you want to test.
 -   [ ] When you are done with your work, all members of your team should make a submission on MyCourses with the 7-digit SHA hash of the commit you want graded as the submission's comment.
-
+-   [ ] Sample test cases: [m2_5k.txt](m2_5k.txt)
 _Do not upload any files using MyCourses!_
 
 ## How to compile and run your code
