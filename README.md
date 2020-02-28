@@ -17,6 +17,7 @@ _Do not upload any files using MyCourses!_
 ## How to compile and run your code
 1. Compile your project  
 ```bash
+bash
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD
 make all
 ```
