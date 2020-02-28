@@ -40,9 +40,4 @@ For example: `./test "r3k2K/pppp4/8/8/8/8/p7/8 b q -"`
     -   test.c
     -   test.sh
     -   results.log
--   To test your submission, run the following commands:
 
-```shell
-$ make test
-$ ./test
-```
