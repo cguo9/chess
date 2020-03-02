@@ -54,6 +54,7 @@ typedef struct move Move;
 #define IS_SET(x, n) 	((x) & BIT((n))) */
 #define IS_SET(x, n) 	(((x) & BIT((n))) >> (n))
 /* TODO: given a player x, this macro evaluates to the player's board, i.e., 1 in dicates presense of any piece of the same color on the board, 0 indicates absense */
+/* BOARD(x) is not tested yet */
 #define BOARD(x)		(x.r | x.n | x.b | x.q | x.k | x.p)
 #define FULL_BOARD		(BOARD(player[WHITE]) | BOARD(player[BLACK]))   /* Full board comprising of both players */
 /* TODO: Macro to tell if a square is occupied by a piece of any color */

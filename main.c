@@ -46,11 +46,11 @@ int main(int argc, char const *argv[]) {
   		if(parse_board(board_str)){
 
   			display_board();
-  /*
+
   			printf("Current Player: %d\n", CurrentPlayer);
-  			printf("Castle flags: %d\n", player[WHITE].castle_flags);
-  			printf("Castle flags: %d\n", player[BLACK].castle_flags);
-  			printf("En Passant square: %d\n", ep_square); */
+  			printf("Castle flags for WHITE PLAYER: %d\n", player[WHITE].castle_flags);
+  			printf("Castle flags for BLACK PLAYER: %d\n", player[BLACK].castle_flags);
+  			printf("En Passant square: %d\n", ep_square);
 
   /*	print statements to check if everything parsed correctly
   			printf("White ROOK = %x	\n",player[WHITE].r );
@@ -103,7 +103,7 @@ int main(int argc, char const *argv[]) {
   			printf("\n");
   */
 
-  			printf("done parsing.");
+  			printf("done parsing.\n");
   			/*return 0; testing purposes */
   		}else{
   			printf("Error parsing input.\n");
@@ -127,9 +127,9 @@ int main(int argc, char const *argv[]) {
   			player[z].castle_flags = NO_CASTLE;
   		}
   		/* probably not necessary since theyre gonna be overwritten */
-  		//ep_square = 0;
-  		//CurrentPlayer = 0;
-  		//mode = UNKNOWN_POS;
+  		ep_square = 0;
+  		CurrentPlayer = 0;
+  		mode = 0;
   	} /* end of file here */
 
   	fclose(fptr); /* dont forget to close the file */
@@ -138,23 +138,16 @@ int main(int argc, char const *argv[]) {
   	return 0;
 }
 
-// function to convert decimal to binary
+/* function to convert decimal to binary */
 void decToBinary(int n)
 {
-    // array to store binary number
     int binaryNum[32];
-
-    // counter for binary array
     int i = 0;
     while (n > 0) {
-
-        // storing remainder in binary array
         binaryNum[i] = n % 2;
         n = n / 2;
         i++;
     }
-
-    // printing binary array in reverse order
     for (int j = i - 1; j >= 0; j--)
          printf("%d", binaryNum[j]);
 }
