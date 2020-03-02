@@ -2,6 +2,7 @@
 #define _CHESS_H_
 
 #include <stdint.h>
+#include <stdio.h>
 
 /* Types for position, board, error and boolean */
 typedef unsigned int 		Pos;
@@ -43,16 +44,22 @@ struct move {
 typedef struct move Move;
 
 #define MAX_STR_SIZE	255
-#define WKING_START_POS	/* TODO: Starting position for the white king */
-#define BKING_START_POS	/* TODO: Starting position for the black king */
+#define WKING_START_POS	3 /* TODO: Starting position for the white king */
+#define BKING_START_POS	59 /* TODO: Starting position for the black king */
 
-#define BIT(n) 			(1UL << (n))
+#define BIT(n) 			(1ULL << (n))
 #define SET_BIT(x, n)	((x) |= BIT((n)))
 #define RESET_BIT(x, n) ((x) &= ~BIT(n))
-#define IS_SET(x, n) 	((x) & BIT((n)))
-#define BOARD(x) 		/* TODO: given a player x, this macro evaluates to the player's board, i.e., 1 in dicates presense of any piece of the same color on the board, 0 indicates absense */
+/* original, but im using the one below for parsing
+#define IS_SET(x, n) 	((x) & BIT((n))) */
+#define IS_SET(x, n) 	(((x) & BIT((n))) >> (n))
+/* TODO: given a player x, this macro evaluates to the player's board, i.e., 1 in dicates presense of any piece of the same color on the board, 0 indicates absense */
+#define BOARD(x)		(x.r | x.n | x.b | x.q | x.k | x.p)
 #define FULL_BOARD		(BOARD(player[WHITE]) | BOARD(player[BLACK]))   /* Full board comprising of both players */
-#define OCCUPIED(n)		/* TODO: Macro to tell if a square is occupied by a piece of any color */
+/* TODO: Macro to tell if a square is occupied by a piece of any color */
+#define OCCUPIED(n)		(IS_SET(FULL_BOARD, n))
+/* havent confirmed if this works yet, returns 0(FALSE) if not set 1(TRUE) if set */
+
 #define UNOCCUPIED(n)	(!(OCCUPIED(n)))
 
 #define NORTH_OF(sq)	(((sq) > 63 || (sq) < 8)? UNKNOWN_POS : ((sq)-8))
@@ -71,9 +78,9 @@ typedef struct move Move;
 
 /* This macro tells if a move is a promotion move */
 /* Move must already be validated. If pawn is going to 1st or 8th rank, this is a promotion move */
-#define IS_PROMOTION(m)			(((m).piece == PAWN) && ((RANK_OF((m).to) == '1') || (RANK_OF((m).to) == '8'))) 
+#define IS_PROMOTION(m)			(((m).piece == PAWN) && ((RANK_OF((m).to) == '1') || (RANK_OF((m).to) == '8')))
 
-/* The enpassant square */ 
+/* The enpassant square */
 extern Pos ep_square;
 
 /* The player structures. One each for black and white */
@@ -82,10 +89,15 @@ extern PlayerState player[2];
 /* The color of the current player */
 extern PlayerColor CurrentPlayer;
 
-/* The mode in which the chess engine is operating */ 
-extern Mode mode; 
+/* added to check which function we run*/
+enum _mode {RUN_MATE1=1,RUN_MATE2};
+typedef enum _mode Mode;
 
-/* Given a position, find a mate in 2. */ 
+
+/* The mode in which the chess engine is operating */
+extern Mode mode;
+
+/* Given a position, find a mate in 2. */
 Bool run_mate2(Move *soln);
 
 /* Given a position, find a mate in 1. */

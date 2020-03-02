@@ -2,17 +2,22 @@
 #define _IO_H_
 
 #include "chess.h"
+/* added */
+#include <stdio.h>
+#include <stdint.h>
+
+char get_piece(uint64_t i);
 
 void display_board();
 Bool parse_board(char *board);
 
-/* Parses the input move. 
- * This function repeatedly prompts for a move until a valid move is typed in. 
+/* Parses the input move.
+ * This function repeatedly prompts for a move until a valid move is typed in.
  * This function only validates that:
  *	 1) from and to are valid squares on the board.
- *	 2) from and to are separated by a '-' 
+ *	 2) from and to are separated by a '-'
  * This function does not check the legality of the move.
- */ 
+ */
 Move parse_move();
 
 /* This function accepts a move from the user. The move is not validated */
