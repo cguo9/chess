@@ -1,11 +1,58 @@
 #include "moves.h"
+#include "chess.h"
 
 /* Given a color, this function returns a singly linked list of all legal Moves with the head at *m. 
  * The function returns TRUE if at least 1 legal move is available. 
  * The total number of moves found is stored in the address pointed to by pcount. */
 Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
     /* Your implementation */
-
+	/* TODO: Very unsure how **m works, what I wrote doesn't work but
+	 * I wanted to get my ideas down, we can discuss at meeting*/
+	int x = 0;
+	for(int i = 0; i < 63; i++){
+		if(get_piece(i) != ' '){
+			if(get_piece_at(i, WHITE) == PAWN){
+				if(NORTH_OF(i) < 64 && UNOCCUPIED(NORTH_OF(i))){
+					char *temp;
+					temp[0] = FILE_OF(i);
+					temp[1] = RANK_OF(i);
+					m[x].from = temp; /*Obviously doesn't work but this is my thought process*/
+					temp[0] = FILE_OF(NORTH_OF(i));
+					temp[1] = RANK_OF(NORTH_OF(i));
+					m[x].to = temp;
+					m[x].piece = PAWN;
+					x++;
+				}
+				if(get_piece_at(NE_OF(i), BLACK) != UNKNOWN){
+					char *temp;
+					temp[0] = FILE_OF(i);
+					temp[1] = RANK_OF(i);
+					m[x].from = temp;
+					temp[0] = FILE_OF(NE_OF(i));
+					temp[1] = RANK_OF(NE_OF(i));
+					m[x].to = temp;
+					m[x].piece = PAWN;
+					x++;
+				}
+				if(get_piece_at(NW_OF(i), BLACK) != UNKNOWN){
+					char *temp;
+					temp[0] = FILE_OF(i);
+					temp[1] = RANK_OF(i);
+					m[x].from = temp;
+					temp[0] = FILE_OF(NW_OF(i));
+					temp[1] = RANK_OF(NW_OF(i));
+					m[x].to = temp;
+					m[x].piece = PAWN;
+					x++;
+				}
+			}
+			if(get_piece_at(i, BLACK) == PAWN){
+				/*Same as with white but south instead of north and fix colors*/
+			}
+		}
+	}
+	if(x != 0) return TRUE;
+	return FALSE;
 }
 
 /* Returns TRUE if the CurrentPlayer is under checkmate, FALSE otherwise. */
@@ -34,6 +81,28 @@ Bool is_draw() {
  * If there is no piece with color c, UNKNOWN is returned. */
 Piece get_piece_at(Board pos, PlayerColor c) {
     /* Your implementation */
+	if(c == WHITE){
+		switch(get_piece(pos)){
+			case 'R': return ROOK; break;
+			case 'N': return NIGHT; break;
+			case 'B': return BISHOP; break;
+			case 'Q': return QUEEN; break;
+			case 'K': return KING; break;
+			case 'P': return PAWN; break;
+			default: return UNKNOWN;
+		}
+	}
+	else{
+		switch(get_piece(pos)){
+			case 'r': return ROOK; break;
+			case 'n': return NIGHT; break;
+			case 'b': return BISHOP; break;
+			case 'q': return QUEEN; break;
+			case 'k': return KING; break;
+			case 'p': return PAWN; break;
+			default: return UNKNOWN;
+		}
+	}
 }
 
 /* Check if this move is trying to castle */
