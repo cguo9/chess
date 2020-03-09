@@ -5,11 +5,14 @@
  * The total number of moves found is stored in the address pointed to by pcount. */
 Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
     /* Your implementation */
+
 }
 
 /* Returns TRUE if the CurrentPlayer is under checkmate, FALSE otherwise. */
 Bool is_checkmate() {
     /* Your implementation */
+    if (legal_moves != TRUE) return TRUE;
+    return FALSE; 
 }
 
 /* Validate a move and make it. Returns TRUE if successful, FALSE if not. 
