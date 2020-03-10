@@ -4,16 +4,16 @@
 #include "chess.h"
 #include "io.h"
 
-/* Given a color, this function returns a singly linked list of all legal Moves with the head at *m. 
- * The function returns TRUE if at least 1 legal move is available. 
+/* Given a color, this function returns a singly linked list of all legal Moves with the head at *m.
+ * The function returns TRUE if at least 1 legal move is available.
  * The total number of moves found is stored in the address pointed to by pcount. */
 Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount);
 
 /* Returns TRUE if the CurrentPlayer is under checkmate, FALSE otherwise. */
 Bool is_checkmate();
 
-/* Validate a move and make it. Returns TRUE if successful, FALSE if not. 
- *  Error message if any, are stored in *msg. 
+/* Validate a move and make it. Returns TRUE if successful, FALSE if not.
+ *  Error message if any, are stored in *msg.
  * ep_square (if any) is stored in *ep_sq
  */
 Bool validate_and_move(Move *move, char **msg, PlayerColor c, Pos *ep_sq);
@@ -23,7 +23,7 @@ Bool validate_and_move(Move *move, char **msg, PlayerColor c, Pos *ep_sq);
 	/* 3 move repetition also covers perpetual check */
 Bool is_draw();
 
-/* Returns the piece on a square belonging to player color c. 
+/* Returns the piece on a square belonging to player color c.
  * If there is no piece with color c, UNKNOWN is returned. */
 Piece get_piece_at(Board pos, PlayerColor c);
 
@@ -32,5 +32,15 @@ unsigned int detect_castle_move(Move move, PlayerColor c);
 
 /* Perform castling. Moves king and rook and resets castle flags */
 void perform_castle(unsigned int castle, PlayerColor c);
+
+void save_state(); //save all global variables
+
+void restore_state(); //restore all global variables
+
+void capture_piece(); //clear bit of opponent piece, set bit of your piece at that position
+
+Bool king_is_checked(PlayerColor c);
+
+Bool king_is_checked(PlayerColor c); //returns TRUE if king is under check, FALSE otherwise
 
 #endif

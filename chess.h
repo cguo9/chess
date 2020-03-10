@@ -104,5 +104,10 @@ Bool run_mate2(Move *soln);
 /* Given a position, find a mate in 1. */
 Bool run_mate1(Move *soln);
 
+/* temp global variables to save/load state with */
+extern Pos temp_ep_square;
+extern PlayerState temp_player[2];
+extern _PlayerColor temp_currentPlayer;
+//storing mode? it shouldnt change
 
 #endif
