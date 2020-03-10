@@ -15,7 +15,62 @@ void restore_state(){
 
 void capture_piece(); //clear bit of opponent piece, set bit of your piece at that position
 
-void make_move(PlayerColor c, Pos pos); //make a move without validating. Clear bit at current position for current player. Set bit for the new position for current player.
+void make_move(Move m, PlayerColor c){
+	switch(m->piece){
+			case ROOK: 
+				RESET_BIT(player[c].r,m->from);
+				SET_BIT(player[c].r,m->to); 
+				break;
+			case KING:
+				RESET_BIT(player[c].k,m->from);
+				SET_BIT(player[c].k,m->to); 
+				break;
+			case QUEEN: 
+				RESET_BIT(player[c].q,m->from);
+				SET_BIT(player[c].q,m->to); 
+				break;
+			case BISHOP:
+				RESET_BIT(player[c].b,m->from);
+				SET_BIT(player[c].b,m->to); 
+				break;
+			case NIGHT:
+				RESET_BIT(player[c].n,m->from);
+				SET_BIT(player[c].n,m->to); 
+				break;
+			case PAWN:
+				RESET_BIT(player[c].p,m->from);
+				SET_BIT(player[c].p,m->to); 
+				break;
+			//default: return UNKNOWN;
+		}
+	Piece capture = get_piece_at(move->to, 1-c); //check if any opponent piece where we are trying to move to
+	if(capture){
+		switch(capture){ //reset bit of opponent piece where we are trying to move to
+			case ROOK: 
+				RESET_BIT(player[1-c].r,m->to);
+				break;
+			case KING:
+				RESET_BIT(player[1-c].k,m->to); 
+				break;
+			case QUEEN: 
+				RESET_BIT(player[1-c].q,m->to);
+				break;
+			case BISHOP:
+				RESET_BIT(player[1-c].b,m->to);
+				break;
+			case NIGHT:
+				RESET_BIT(player[1-c].n,m->to);
+				break;
+			case PAWN:
+				RESET_BIT(player[1-c].p,m->to);
+				break;
+			//default: return UNKNOWN;
+		}
+	}
+	
+}
+
+//void make_move(PlayerColor c, Pos pos); //make a move without validating. Clear bit at current position for current player. Set bit for the new position for current player.
 
 Bool king_is_checked(PlayerColor c){
 //need to access the list generated from legal_moves()
