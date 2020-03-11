@@ -9,7 +9,7 @@ void capture_piece(); //clear bit of opponent piece, set bit of your piece at th
 
 void make_move(PlayerColor c, Pos pos); //make a move without validating. Clear bit at current position for current player. Set bit for the new position for current player.
 
-Board get_king_moves(Pos pos) { //check if you are getting checked if you move & if piece exists on a spot (if bit in position is set to 1 on FULLBOARD)
+Board get_king_moves(Pos pos, PlayerColor c) { //check if you are getting checked if you move & if piece exists on a spot (if bit in position is set to 1 on FULLBOARD)
 	Board king_board = BIT(pos);
 	king_board = SET_BIT(king_board, NORTH_OF(pos));
 	king_board = SET_BIT(king_board, SOUTH_OF(pos));
@@ -24,11 +24,74 @@ Board get_king_moves(Pos pos) { //check if you are getting checked if you move &
 	return king_board;
 }
 
-Board get_rook_moves(Pos pos) { //check for your colored pieces if they are in the way. Check opponent colors for possible capture.
+Board get_rook_moves(Pos pos,PlayerColor c) { //check for your colored pieces if they are in the way. Check opponent colors for possible capture.
 	Board rook_board = BIT(pos);
-	while(NORTH_OF(rook_board) >= 0) {
-
+	while(EAST_OF(rook_board) != UNKNOWN_POS) {
+		if(UNOCCUPIED(pos)){
+			SET_BIT(rook_board, EAST_OF(pos));
+		}else{
+			if(IS_SET(BOARD(player[c]), EAST_OF(pos))){
+				break;
+			}else{	//opponent piece is there
+				SET_BIT(rook_board, EAST_OF(pos));
+			}
+		}
 	}
+
+	while(NORTH_OF(rook_board) != UNKNOWN_POS) {
+		if(UNOCCUPIED(pos)){
+			SET_BIT(rook_board, NORTH_OF(pos));
+		}else{
+			if(IS_SET(BOARD(player[c]), NORTH_OF(pos))){
+				break;
+			}else{	//opponent piece is there
+				SET_BIT(rook_board, NORTH_OF(pos));
+			}
+		}
+	}
+
+	while(SOUTH_OF(rook_board) != UNKNOWN_POS) {
+		if(UNOCCUPIED(pos)){
+			SET_BIT(rook_board, SOUTH_OF(pos));
+		}else{
+			if(IS_SET(BOARD(player[c]), SOUTH_OF(pos))){
+				break;
+			}else{	//opponent piece is there
+				SET_BIT(rook_board, SOUTH_OF(pos));
+			}
+		}
+	}
+
+	while(WEST_OF(rook_board) != UNKNOWN_POS) {
+		if(UNOCCUPIED(pos)){
+			SET_BIT(rook_board, WEST_OF(pos));
+		}else{
+			if(IS_SET(BOARD(player[c]), WEST_OF(pos))){
+				break;
+			}else{	//opponent piece is there
+				SET_BIT(rook_board, WEST_OF(pos));
+			}
+		}
+	}
+	if((player[c].castle_flags == CASTLE_KING)){
+		SET_BIT(rook_board, BIT((pos-2)));
+		player[c].castle_flags = NO_CASTLE;
+	}else if ((player[c].castle_flags == CASTLE_QUEEN)){
+		SET_BIT(rook_board, BIT((pos+3)));
+		player[c].castle_flags = NO_CASTLE;	//do we set this here?
+		//we can set castle_flags when we are actually making the move in validate_and_move
+	}
+	RESET_BIT(rook_board, pos);
+	return rook_board;
+
+}
+
+
+Board get_pawn_moves(Pos pos,PlayerColor c) {
+	Board pawn_board = BIT(pos);
+	//if color is black, check if its still in starting pos, if it is you can move NORTH_OF or NORTH_OF(NORTH_OF())
+	//check the same for white and black
+
 }
 
 Bool king_is_checked(PlayerColor c); //returns TRUE if king is under check, FALSE otherwise
@@ -43,7 +106,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 	int x = 0;
 	for(int pos = 0; pos < 64; pos++){
 		if (IS_SET(player[c].k, pos)) {
-			Board king_moves = get_king_moves(pos);
+			Board king_moves = get_king_moves(pos,c);
 			for(int i = 0; i < 64; i++) {
 				if(IS_SET(king_moves, i)) {
 					save_state();
@@ -125,6 +188,9 @@ Bool is_checkmate() {
  */
 Bool validate_and_move(Move *move, char **msg, PlayerColor c, Pos *ep_sq) {
     /* Your implementation */
+
+//set castle_flags if rook/king is moving and ep_sq if pawn is moving
+
 }
 
 /* Function to decide whether the current position is a draw */
@@ -160,6 +226,12 @@ Piece get_piece_at(Board pos, PlayerColor c) {
 			default: return UNKNOWN;
 		}
 	}
+}
+
+PlayerColor get_color_at(Pos pos){
+    if((get_piece(pos) == 'R') || (get_piece(pos) == 'N') || (get_piece(pos) == 'B') || (get_piece(pos) == 'Q')
+    || (get_piece(pos) == 'K') || (get_piece(pos) == 'P')) return WHITE;
+    else return BLAK;
 }
 
 /* Check if this move is trying to castle */
