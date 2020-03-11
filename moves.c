@@ -30,26 +30,87 @@ Bool king_is_checked(PlayerColor c){
 
 }
 
-Board get_king_moves(Pos pos) { //check if you are getting checked if you move & if piece exists on a spot (if bit in position is set to 1 on FULLBOARD)
+Board get_king_moves(Pos pos, PlayerColor c) { //check if you are getting checked if you move & if piece exists on a spot (if bit in position is set to 1 on FULLBOARD)
 	Board king_board = BIT(pos);
-	king_board = SET_BIT(king_board, NORTH_OF(pos));
-	king_board = SET_BIT(king_board, SOUTH_OF(pos));
-	king_board = SET_BIT(king_board, WEST_OF(pos));
-	king_board = SET_BIT(king_board, EAST_OF(pos));
-	king_board = SET_BIT(king_board, NW_OF(pos));
-	king_board = SET_BIT(king_board, NE_OF(pos));
-	king_board = SET_BIT(king_board, SW_OF(pos));
-	king_board = SET_BIT(king_board, SE_OF(pos));
-	king_board = RESET_BIT(king_board, pos);
-	//also need to set all castle_flags to NO_CASTLE
+	if(NORTH_OF(pos) != UNKNOWN_POS) SET_BIT(king_board, NORTH_OF(pos));
+	if(SOUTH_OF(pos) != UNKNOWN_POS) SET_BIT(king_board, SOUTH_OF(pos));
+	if(WEST_OF(pos) != UNKNOWN_POS) SET_BIT(king_board, WEST_OF(pos));
+	if(EAST_OF(pos) != UNKNOWN_POS) SET_BIT(king_board, EAST_OF(pos));
+	if(NW_OF(pos) != UNKNOWN_POS) SET_BIT(king_board, NW_OF(pos));
+	if(NE_OF(pos) != UNKNOWN_POS) SET_BIT(king_board, NE_OF(pos));
+	if(SW_OF(pos) != UNKNOWN_POS) SET_BIT(king_board, SW_OF(pos));
+	if(SE_OF(pos) != UNKNOWN_POS) SET_BIT(king_board, SE_OF(pos));
+	if((player[c].castle_flags == CASTLE_KING)){
+		SET_BIT(king_board, BIT((pos+2)));
+		player[c].castle_flags = NO_CASTLE;
+	}else if ((player[c].castle_flags == CASTLE_QUEEN)){
+		SET_BIT(king_board, BIT((pos-3)));
+		player[c].castle_flags = NO_CASTLE;	//do we set this here?
+	}
+	RESET_BIT(king_board, pos);
 	return king_board;
 }
 
-Board get_rook_moves(Pos pos) { //check for your colored pieces if they are in the way. Check opponent colors for possible capture.
+Board get_rook_moves(Pos pos,PlayerColor c) { //check for your colored pieces if they are in the way. Check opponent colors for possible capture.
 	Board rook_board = BIT(pos);
-	while(NORTH_OF(rook_board) >= 0) {
-
+	while(EAST_OF(rook_board) != UNKNOWN_POS) {
+		if(UNOCCUPIED(pos)){
+			SET_BIT(rook_board, EAST_OF(pos));
+		}else{
+			if(IS_SET(BOARD(player[c]), EAST_OF(pos))){
+				break;
+			}else{	//opponent piece is there
+				SET_BIT(rook_board, EAST_OF(pos));
+			}
+		}
 	}
+
+	while(NORTH_OF(rook_board) != UNKNOWN_POS) {
+		if(UNOCCUPIED(pos)){
+			SET_BIT(rook_board, NORTH_OF(pos));
+		}else{
+			if(IS_SET(BOARD(player[c]), NORTH_OF(pos))){
+				break;
+			}else{	//opponent piece is there
+				SET_BIT(rook_board, NORTH_OF(pos));
+			}
+		}
+	}
+
+	while(SOUTH_OF(rook_board) != UNKNOWN_POS) {
+		if(UNOCCUPIED(pos)){
+			SET_BIT(rook_board, SOUTH_OF(pos));
+		}else{
+			if(IS_SET(BOARD(player[c]), SOUTH_OF(pos))){
+				break;
+			}else{	//opponent piece is there
+				SET_BIT(rook_board, SOUTH_OF(pos));
+			}
+		}
+	}
+
+	while(WEST_OF(rook_board) != UNKNOWN_POS) {
+		if(UNOCCUPIED(pos)){
+			SET_BIT(rook_board, WEST_OF(pos));
+		}else{
+			if(IS_SET(BOARD(player[c]), WEST_OF(pos))){
+				break;
+			}else{	//opponent piece is there
+				SET_BIT(rook_board, WEST_OF(pos));
+			}
+		}
+	}
+	if((player[c].castle_flags == CASTLE_KING)){
+		SET_BIT(rook_board, BIT((pos-2)));
+		player[c].castle_flags = NO_CASTLE;
+	}else if ((player[c].castle_flags == CASTLE_QUEEN)){
+		SET_BIT(rook_board, BIT((pos+3)));
+		player[c].castle_flags = NO_CASTLE;	//do we set this here?
+		//we can set castle_flags when we are actually making the move in validate_and_move
+	}
+	RESET_BIT(rook_board, pos);
+	return rook_board;
+
 }
 
 
@@ -65,13 +126,13 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 	for(int pos = 0; pos < 64; pos++){
 		if (IS_SET(player[c].k, pos)) {
-			Board king_moves = get_king_moves(pos);
+			Board king_moves = get_king_moves(pos,c);
 			for(int i = 0; i < 64; i++) {
 				if(IS_SET(king_moves, i)) {
 					save_state();
-					make_move(c, pos);
-					//we should do king moves last since by then we would have the list
-					//of all legal moves of all the other pieces
+					//make_move(c, pos); do this in validate_and_move()
+					SET_BIT(player[c].k, i);
+					RESET_BIT(player[c].k, pos);
 					if(king_is_checked(c) == TRUE) {
 						restore_state();
 						continue;
@@ -152,6 +213,9 @@ Bool is_checkmate() {
  */
 Bool validate_and_move(Move *move, char **msg, PlayerColor c, Pos *ep_sq) {
     /* Your implementation */
+
+//set castle_flags if rook/king is moving and ep_sq if pawn is moving
+
 }
 
 /* Function to decide whether the current position is a draw */
