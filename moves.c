@@ -168,6 +168,14 @@ Board get_rook_moves(Pos pos,PlayerColor c) { //check for your colored pieces if
 }
 
 
+Board get_pawn_moves(Pos pos,PlayerColor c) {
+	Board pawn_board = BIT(pos);
+	//if color is black, check if its still in starting pos, if it is you can move NORTH_OF or NORTH_OF(NORTH_OF())
+	//check the same for white and black
+
+}
+
+
 /* Given a color, this function returns a singly linked list of all legal Moves with the head at *m.
  * The function returns TRUE if at least 1 legal move is available.
  * The total number of moves found is stored in the address pointed to by pcount. */
