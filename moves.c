@@ -67,7 +67,6 @@ void make_move(Move m, PlayerColor c){
 			//default: return UNKNOWN;
 		}
 	}
-
 }
 
 //void make_move(PlayerColor c, Pos pos); //make a move without validating. Clear bit at current position for current player. Set bit for the new position for current player.
