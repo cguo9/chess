@@ -1,26 +1,115 @@
 #include "moves.h"
 #include "chess.h"
 
-void save_state(); //save all global variables
+void save_state(){
+	temp_ep_square = ep_square;
+	temp_player = player;
+	temp_currentPlayer = CurrentPlayer;
+}
 
-void restore_state(); //restore all global variables
+void restore_state(){
+	ep_square = temp_ep_square;
+	player = temp_player;
+	CurrentPlayer = temp_currentPlayer;
+}
 
 void capture_piece(); //clear bit of opponent piece, set bit of your piece at that position
 
-void make_move(PlayerColor c, Pos pos); //make a move without validating. Clear bit at current position for current player. Set bit for the new position for current player.
+void make_move(Move m, PlayerColor c){
+	switch(m->piece){
+			case ROOK:
+				RESET_BIT(player[c].r,m->from);
+				SET_BIT(player[c].r,m->to);
+				break;
+			case KING:
+				RESET_BIT(player[c].k,m->from);
+				SET_BIT(player[c].k,m->to);
+				break;
+			case QUEEN:
+				RESET_BIT(player[c].q,m->from);
+				SET_BIT(player[c].q,m->to);
+				break;
+			case BISHOP:
+				RESET_BIT(player[c].b,m->from);
+				SET_BIT(player[c].b,m->to);
+				break;
+			case NIGHT:
+				RESET_BIT(player[c].n,m->from);
+				SET_BIT(player[c].n,m->to);
+				break;
+			case PAWN:
+				RESET_BIT(player[c].p,m->from);
+				SET_BIT(player[c].p,m->to);
+				break;
+			//default: return UNKNOWN;
+		}
+	Piece capture = get_piece_at(move->to, 1-c); //check if any opponent piece where we are trying to move to
+	if(capture){
+		switch(capture){ //reset bit of opponent piece where we are trying to move to
+			case ROOK:
+				RESET_BIT(player[1-c].r,m->to);
+				break;
+			case KING:
+			//dont think this case should ever be hit
+				RESET_BIT(player[1-c].k,m->to);
+				break;
+			case QUEEN:
+				RESET_BIT(player[1-c].q,m->to);
+				break;
+			case BISHOP:
+				RESET_BIT(player[1-c].b,m->to);
+				break;
+			case NIGHT:
+				RESET_BIT(player[1-c].n,m->to);
+				break;
+			case PAWN:
+				RESET_BIT(player[1-c].p,m->to);
+				break;
+			//default: return UNKNOWN;
+		}
+	}
+
+}
+
+
+//void make_move(PlayerColor c, Pos pos); //make a move without validating. Clear bit at current position for current player. Set bit for the new position for current player.
 
 Board get_king_moves(Pos pos, PlayerColor c) { //check if you are getting checked if you move & if piece exists on a spot (if bit in position is set to 1 on FULLBOARD)
 	Board king_board = BIT(pos);
-	king_board = SET_BIT(king_board, NORTH_OF(pos));
-	king_board = SET_BIT(king_board, SOUTH_OF(pos));
-	king_board = SET_BIT(king_board, WEST_OF(pos));
-	king_board = SET_BIT(king_board, EAST_OF(pos));
-	king_board = SET_BIT(king_board, NW_OF(pos));
-	king_board = SET_BIT(king_board, NE_OF(pos));
-	king_board = SET_BIT(king_board, SW_OF(pos));
-	king_board = SET_BIT(king_board, SE_OF(pos));
-	king_board = RESET_BIT(king_board, pos);
-
+	//check if the direction is not out of board and if not occupied
+	if((NORTH_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(NORTH_OF(pos)))) {
+		SET_BIT(king_board, NORTH_OF(pos));
+	}
+	if((SOUTH_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(SOUTH_OF(pos)))) {
+		SET_BIT(king_board, SOUTH_OF(pos));
+	}
+	if((WEST_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(WEST_OF(pos)))){
+		SET_BIT(king_board, WEST_OF(pos));
+	}
+	if((EAST_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(EAST_OF(pos)))) {
+		SET_BIT(king_board, EAST_OF(pos));
+	}
+	if((NW_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(NW_OF(pos)))){
+		SET_BIT(king_board, NW_OF(pos));
+	}
+	if((NE_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(NE_OF(pos)))){
+		SET_BIT(king_board, NE_OF(pos));
+	}
+	if((SW_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(SW_OF(pos)))){
+		SET_BIT(king_board, SW_OF(pos));
+	}
+	if((SE_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(SE_OF(pos)))){
+		SET_BIT(king_board, SE_OF(pos));
+	}
+	//also need to set all castle_flags to NO_CASTLE
+	if((player[c].castle_flags == CASTLE_KING)){
+		SET_BIT(king_board, BIT((pos+2)));
+		player[c].castle_flags = NO_CASTLE;
+	}else if ((player[c].castle_flags == CASTLE_QUEEN)){
+		SET_BIT(king_board, BIT((pos-3)));
+		player[c].castle_flags = NO_CASTLE;	//do we set this here?
+	}
+	RESET_BIT(king_board, pos);
 	return king_board;
 }
 
@@ -94,7 +183,28 @@ Board get_pawn_moves(Pos pos,PlayerColor c) {
 
 }
 
-Bool king_is_checked(PlayerColor c); //returns TRUE if king is under check, FALSE otherwise
+Board get_bishop_moves(Pos pos, PlayerColor c){
+	Board bishop_board = BIT(pos);
+
+
+}
+
+Board get_queen_moves(Pos pos, PlayerColor c){
+	Board queen_board = (get_rook_moves(pos,c)) | (get_bishop_moves(pos,c));
+	return queen_board;
+}
+
+Bool king_is_checked(PlayerColor c){
+//need to access the list generated from legal_moves()
+	/* PSEUDO:
+	is_king_under_check(color){
+	For each legal_move(1-c) → opponent's legal moves
+		If (is_set(player[color].k , player[color]move->to))
+			Return true;
+		Else return false;
+	} */
+	return false;
+}
 
 /* Given a color, this function returns a singly linked list of all legal Moves with the head at *m.
  * The function returns TRUE if at least 1 legal move is available.
@@ -103,7 +213,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
     /* Your implementation */
 	/* TODO: Very unsure how **m works, what I wrote doesn't work but
 	 * I wanted to get my ideas down, we can discuss at meeting*/
-	int x = 0;
+ 	unsigned int count = 0;
 	for(int pos = 0; pos < 64; pos++){
 		if (IS_SET(player[c].k, pos)) {
 			Board king_moves = get_king_moves(pos,c);
@@ -116,9 +226,10 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						restore_state();
 						continue;
 					} else {
+						count++;
 						Move *temp = (Move *) malloc(sizeof(Move));
-						temp->from = pos; //64 bit with 1 in the posiiton pos
-						temp->to = pos; //64 bit with 1 in the position i
+						temp->from = BIT(pos); //64 bit with 1 in the posiiton pos
+						temp->to = BIT(i); //64 bit with 1 in the position i
 						temp->piece = KING;
 						temp->promotion_choice = UNKNOWN;
 						if (m == NULL) m = temp;
@@ -171,7 +282,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 			}
 		}*/
 	}
-	if(x != 0) return TRUE;
+	if(count != 0) return TRUE;
 	return FALSE;
 }
 
