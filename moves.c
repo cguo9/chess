@@ -194,15 +194,49 @@ Board get_queen_moves(Pos pos, PlayerColor c){
 	return queen_board;
 }
 
-Bool king_is_checked(PlayerColor c){
-//need to access the list generated from legal_moves()
-	/* PSEUDO:
-	is_king_under_check(color){
-	For each legal_move(1-c) → opponent's legal moves
-		If (is_set(player[color].k , player[color]move->to))
-			Return true;
-		Else return false;
-	} */
+
+//generate a 64 bit with 1s where all the places the opponents will move.
+//check if your king position (whether youre moving it or moving another piece)
+//is going to overlap with that 64 bit. if it is, then it is under check and it
+//is not a legal move. if not, then it is legal and put it into the linked list.
+
+Bool king_is_checked(Pos pos, PlayerColor c){
+	//**POS PASSED IN SHOULD BE 0-63**
+	//pos of the king , c is color of that king
+	Board all_possible_captures;
+	Piece temp;
+	for(int i = 0; i < 64; i++){
+		//if(c == WHITE){	idk if we actually need to check the color
+		//getting board of all possible opponent moves
+		temp = get_piece_at(BIT(i), (1-c));
+		switch(temp){
+			case ROOK:
+				SET_BIT(all_possible_captures, get_rook_moves(BIT(i), 1-c));
+				break;
+			case NIGHT:
+				SET_BIT(all_possible_captures, get_night_moves(BIT(i), 1-c));
+				break;
+			case BISHOP:
+				SET_BIT(all_possible_captures, get_bishop_moves(BIT(i), 1-c));
+				break;
+			case QUEEN:
+				SET_BIT(all_possible_captures, get_queen_moves(BIT(i), 1-c));
+				break;
+			case KING:
+				SET_BIT(all_possible_captures, get_king_moves(BIT(i), 1-c));
+				break;
+			case PAWN:
+				SET_BIT(all_possible_captures, get_pawn_moves(BIT(i), 1-c));
+				break;
+			case UNKNOWN:
+				break;
+		}
+		//}else{}	//black
+	}
+	//got a board with 1s in places where you can get captured
+	if(IS_SET(all_possible_captures, pos)){
+		return true;
+	}
 	return false;
 }
 
@@ -214,15 +248,23 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 	/* TODO: Very unsure how **m works, what I wrote doesn't work but
 	 * I wanted to get my ideas down, we can discuss at meeting*/
  	unsigned int count = 0;
+	//make a head and assign m to point to head
+	Move *head = (Move *) malloc(sizeof(Move));
+	m = &head;
+	//use head_iterator to build up linked list
+	//NEVER MOVE HEAD since m is pointing to it so we always have a pointer to start of list
+	Move *head_iterator = head;
+	//not sure if this is right cause double pointers confuse me
+
+
 	for(int pos = 0; pos < 64; pos++){
 		if (IS_SET(player[c].k, pos)) {
 			Board king_moves = get_king_moves(pos,c);
 			for(int i = 0; i < 64; i++) {
 				if(IS_SET(king_moves, i)) {
 					save_state();
-					make_move(c, pos);
-
-					if(king_is_checked(c) == TRUE) {
+					make_move(c, pos); // need to restore since we're not actually moving here
+					if(king_is_checked(pos, c) == TRUE) {
 						restore_state();
 						continue;
 					} else {
@@ -232,15 +274,19 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						temp->to = BIT(i); //64 bit with 1 in the position i
 						temp->piece = KING;
 						temp->promotion_choice = UNKNOWN;
-						if (m == NULL) m = temp;
+						restore_state();
+						if (head == NULL) head = temp;	//THE ONE TIME WE SET HEAD // rest will be using head_iterator
 						else {
-							m->next_move = temp;
-							m = m->next_move;
+							head_iterator->next_move = temp;
+							head_iterator = head_iterator->next_move;
+							//this if/else should be same for the rest of these -> if (IS_SET(player[c].r, pos)) ... if (IS_SET(player[c].q, pos)) ...
 						}
 					}
 				}
 			}
-		}
+		} // end of if (IS_SET(player[c].k, pos))
+
+
 		/*if(get_piece(i) != ' '){
 			if(get_piece_at(i, WHITE) == PAWN){
 				if(NORTH_OF(i) < 64 && UNOCCUPIED(NORTH_OF(i))){
