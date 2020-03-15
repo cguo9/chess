@@ -33,14 +33,12 @@ unsigned int detect_castle_move(Move move, PlayerColor c);
 /* Perform castling. Moves king and rook and resets castle flags */
 void perform_castle(unsigned int castle, PlayerColor c);
 
-void save_state(); //save all global variables
+void save_state(); /*save all global variables*/
 
-void restore_state(); //restore all global variables
+void restore_state(); /*restore all global variables*/
 
-void capture_piece(); //clear bit of opponent piece, set bit of your piece at that position
+void capture_piece(); /*clear bit of opponent piece, set bit of your piece at that position*/
 
-Bool king_is_checked(PlayerColor c);
-
-Bool king_is_checked(PlayerColor c); //returns TRUE if king is under check, FALSE otherwise
+Bool king_is_checked(Pos pos, PlayerColor c); /*returns TRUE if king is under check, FALSE otherwise*/
 
 #endif

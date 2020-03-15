@@ -62,11 +62,12 @@ Bool parse_board(char *board) { /* DOES NOT PARSE THE MODE YET */
     char rank_holder;
     char file_holder;
     int temp_val = 0;
+    int i;
 /*
     while((read_c = fgetc(fp)) != '\n'){
 
      read single char*/
-     for(int i = 0; i < strlen(board); i++){
+     for(i = 0; i < strlen(board); i++){
          read_c = board[i];
          temp_val = read_c - '0';
          if(position < 64){
@@ -204,16 +205,22 @@ Bool parse_board(char *board) { /* DOES NOT PARSE THE MODE YET */
  *	 2) from and to are separated by a '-'
  * This function does not check the legality of the move.
  */
+
+ /*
 Move parse_move() {
-    /* Your implementation */
+
 }
+*/
 
 /* This function accepts a move from the user. The move is not validated */
+/*
 void prompt_move(Move *m, unsigned int move_number) {
-    /* Your implementation */
-}
 
-/* This function prints a move on to the console */
-void print_move(Move *m) {
-    /* Your implementation */
 }
+*/
+/* This function prints a move on to the console */
+/*
+void print_move(Move *m) {
+
+}
+*/

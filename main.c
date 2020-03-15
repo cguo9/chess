@@ -11,9 +11,12 @@ Pos ep_square;
 PlayerColor CurrentPlayer;
 Mode mode;
 
-/* used to test || delete later */
+PlayerState temp_player[2];
+Pos temp_ep_square;
+PlayerColor temp_currentPlayer;
+/* used to test || delete later
 void decToBinary(int n);
-
+*/
 int main(int argc, char const *argv[]) {
   /* Your testing code here. */
   /*	outline:
@@ -46,6 +49,7 @@ int main(int argc, char const *argv[]) {
   		if(parse_board(board_str)){
 
   			display_board();
+
 
   			printf("Current Player: %d\n", CurrentPlayer);
   			printf("Castle flags for WHITE PLAYER: %d\n", player[WHITE].castle_flags);
@@ -109,6 +113,20 @@ int main(int argc, char const *argv[]) {
   			printf("Error parsing input.\n");
   			return 0;
   		}
+        Move *moves;
+        unsigned int count;
+        Move *temp_head = moves;
+        if(legal_moves(&moves, CurrentPlayer, &count)){
+            while(temp_head != NULL){
+                printf("FROM: %u\n", temp_head->from);
+                printf("TO: %u\n", temp_head->to);
+                printf("PIECE: %d\n", (int)temp_head->piece);
+                printf("PROMOTION PIECE: %d\n", (int)temp_head->promotion_choice);
+                printf("Number of moves in linked list: %d\n", count);
+                temp_head = temp_head->next_move;
+            }
+        }
+
   		/*
   		if(mode == 1){
   			run_mate1();
@@ -117,7 +135,8 @@ int main(int argc, char const *argv[]) {
   		} */
   		/* store solution in result.txt*/
   		memset(board_str, 0, 150); /* reset everything for next puzzle */
-  		for(int z = 0; z < 2; z++){
+        int z;
+  		for(z = 0; z < 2; z++){
   			player[z].r &= 0;
   			player[z].n &= 0;
   			player[z].b &= 0;
@@ -139,6 +158,7 @@ int main(int argc, char const *argv[]) {
 }
 
 /* function to convert decimal to binary */
+/*
 void decToBinary(int n)
 {
     int binaryNum[32];
@@ -151,3 +171,4 @@ void decToBinary(int n)
     for (int j = i - 1; j >= 0; j--)
          printf("%d", binaryNum[j]);
 }
+*/

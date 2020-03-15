@@ -1,21 +1,24 @@
 #include "moves.h"
 #include "chess.h"
 
+
 void save_state(){
-	temp_ep_square = ep_square;
-	temp_player = player;
-	temp_currentPlayer = CurrentPlayer;
+	memcpy(&temp_player, &player, sizeof(PlayerState));
+	memcpy(&temp_ep_square, &ep_square, sizeof(Pos));
+	memcpy(&temp_currentPlayer, &CurrentPlayer, sizeof(PlayerColor));
 }
 
 void restore_state(){
-	ep_square = temp_ep_square;
-	player = temp_player;
-	CurrentPlayer = temp_currentPlayer;
+	memcpy(&ep_square, &temp_ep_square, sizeof(Pos));
+	memcpy(&CurrentPlayer, &temp_currentPlayer, sizeof(PlayerColor));
+	memcpy(&player, &temp_player, sizeof(PlayerState));
 }
 
-void capture_piece(); //clear bit of opponent piece, set bit of your piece at that position
+void capture_piece();
 
-void make_move(Move m, PlayerColor c){
+/* clear bit of opponent piece, set bit of your piece at that position */
+
+void make_move(Move *m, PlayerColor c){
 	switch(m->piece){
 			case ROOK:
 				RESET_BIT(player[c].r,m->from);
@@ -41,16 +44,19 @@ void make_move(Move m, PlayerColor c){
 				RESET_BIT(player[c].p,m->from);
 				SET_BIT(player[c].p,m->to);
 				break;
-			//default: return UNKNOWN;
+			case UNKNOWN: break;
+
 		}
-	Piece capture = get_piece_at(move->to, 1-c); //check if any opponent piece where we are trying to move to
+	Piece capture = get_piece_at(m->to, 1-c);
+	/*check if any opponent piece where we are trying to move to*/
 	if(capture){
-		switch(capture){ //reset bit of opponent piece where we are trying to move to
+		switch(capture){
+			/*reset bit of opponent piece where we are trying to move to*/
 			case ROOK:
 				RESET_BIT(player[1-c].r,m->to);
 				break;
 			case KING:
-			//dont think this case should ever be hit
+			/*dont think this case should ever be hit*/
 				RESET_BIT(player[1-c].k,m->to);
 				break;
 			case QUEEN:
@@ -65,18 +71,22 @@ void make_move(Move m, PlayerColor c){
 			case PAWN:
 				RESET_BIT(player[1-c].p,m->to);
 				break;
-			//default: return UNKNOWN;
+			case UNKNOWN: break;
 		}
 	}
 
 }
 
 
-//void make_move(PlayerColor c, Pos pos); //make a move without validating. Clear bit at current position for current player. Set bit for the new position for current player.
+/*void make_move(PlayerColor c, Pos pos);
+make a move without validating. Clear bit at current position for current player. Set bit for the new position for current player.
+*/
+Board get_king_moves(Pos pos, PlayerColor c) {
+/*check if you are getting checked if you move & if piece exists on a spot (if bit in position is set to 1 on FULLBOARD)
+*/
 
-Board get_king_moves(Pos pos, PlayerColor c) { //check if you are getting checked if you move & if piece exists on a spot (if bit in position is set to 1 on FULLBOARD)
 	Board king_board = BIT(pos);
-	//check if the direction is not out of board and if not occupied
+	/*check if the direction is not out of board and if not occupied*/
 	if((NORTH_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(NORTH_OF(pos)))) {
 		SET_BIT(king_board, NORTH_OF(pos));
 	}
@@ -101,19 +111,23 @@ Board get_king_moves(Pos pos, PlayerColor c) { //check if you are getting checke
 	if((SE_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(SE_OF(pos)))){
 		SET_BIT(king_board, SE_OF(pos));
 	}
-	//also need to set all castle_flags to NO_CASTLE
+	/*also need to set all castle_flags to NO_CASTLE*/
+	/*
 	if((player[c].castle_flags == CASTLE_KING)){
 		SET_BIT(king_board, BIT((pos+2)));
 		player[c].castle_flags = NO_CASTLE;
 	}else if ((player[c].castle_flags == CASTLE_QUEEN)){
 		SET_BIT(king_board, BIT((pos-3)));
-		player[c].castle_flags = NO_CASTLE;	//do we set this here?
+		player[c].castle_flags = NO_CASTLE;
 	}
+	*/
 	RESET_BIT(king_board, pos);
 	return king_board;
 }
 
-Board get_rook_moves(Pos pos,PlayerColor c) { //check for your colored pieces if they are in the way. Check opponent colors for possible capture.
+Board get_rook_moves(Pos pos,PlayerColor c) {
+	/*check for your colored pieces if they are in the way. Check opponent colors for possible capture.
+*/
 	Board rook_board = BIT(pos);
 	while(EAST_OF(rook_board) != UNKNOWN_POS) {
 		if(UNOCCUPIED(pos)){
@@ -121,7 +135,7 @@ Board get_rook_moves(Pos pos,PlayerColor c) { //check for your colored pieces if
 		}else{
 			if(IS_SET(BOARD(player[c]), EAST_OF(pos))){
 				break;
-			}else{	//opponent piece is there
+			}else{	/*opponent piece is there*/
 				SET_BIT(rook_board, EAST_OF(pos));
 			}
 		}
@@ -133,7 +147,7 @@ Board get_rook_moves(Pos pos,PlayerColor c) { //check for your colored pieces if
 		}else{
 			if(IS_SET(BOARD(player[c]), NORTH_OF(pos))){
 				break;
-			}else{	//opponent piece is there
+			}else{
 				SET_BIT(rook_board, NORTH_OF(pos));
 			}
 		}
@@ -145,7 +159,7 @@ Board get_rook_moves(Pos pos,PlayerColor c) { //check for your colored pieces if
 		}else{
 			if(IS_SET(BOARD(player[c]), SOUTH_OF(pos))){
 				break;
-			}else{	//opponent piece is there
+			}else{
 				SET_BIT(rook_board, SOUTH_OF(pos));
 			}
 		}
@@ -157,19 +171,20 @@ Board get_rook_moves(Pos pos,PlayerColor c) { //check for your colored pieces if
 		}else{
 			if(IS_SET(BOARD(player[c]), WEST_OF(pos))){
 				break;
-			}else{	//opponent piece is there
+			}else{
 				SET_BIT(rook_board, WEST_OF(pos));
 			}
 		}
 	}
+	/*
 	if((player[c].castle_flags == CASTLE_KING)){
 		SET_BIT(rook_board, BIT((pos-2)));
 		player[c].castle_flags = NO_CASTLE;
 	}else if ((player[c].castle_flags == CASTLE_QUEEN)){
 		SET_BIT(rook_board, BIT((pos+3)));
-		player[c].castle_flags = NO_CASTLE;	//do we set this here?
-		//we can set castle_flags when we are actually making the move in validate_and_move
+		player[c].castle_flags = NO_CASTLE;
 	}
+	*/
 	RESET_BIT(rook_board, pos);
 	return rook_board;
 
@@ -178,15 +193,16 @@ Board get_rook_moves(Pos pos,PlayerColor c) { //check for your colored pieces if
 
 Board get_pawn_moves(Pos pos,PlayerColor c) {
 	Board pawn_board = BIT(pos);
-	//if color is black, check if its still in starting pos, if it is you can move NORTH_OF or NORTH_OF(NORTH_OF())
-	//check the same for white and black
-
+	/*if color is black, check if its still in starting pos, if it is you can move NORTH_OF or NORTH_OF(NORTH_OF())
+	check the same for white and black
+	*/
+	return pawn_board;
 }
 
 Board get_bishop_moves(Pos pos, PlayerColor c){
 	Board bishop_board = BIT(pos);
 
-
+	return bishop_board;
 }
 
 Board get_queen_moves(Pos pos, PlayerColor c){
@@ -195,19 +211,30 @@ Board get_queen_moves(Pos pos, PlayerColor c){
 }
 
 
-//generate a 64 bit with 1s where all the places the opponents will move.
-//check if your king position (whether youre moving it or moving another piece)
-//is going to overlap with that 64 bit. if it is, then it is under check and it
-//is not a legal move. if not, then it is legal and put it into the linked list.
+Board get_night_moves(Pos pos, PlayerColor c){
+	Board night_board = BIT(pos);
+	return night_board;
+}
 
+/*
+generate a 64 bit with 1s where all the places the opponents will move.
+check if your king position (whether youre moving it or moving another piece)
+is going to overlap with that 64 bit. if it is, then it is under check and it
+is not a legal move. if not, then it is legal and put it into the linked list.
+*/
 Bool king_is_checked(Pos pos, PlayerColor c){
-	//**POS PASSED IN SHOULD BE 0-63**
-	//pos of the king , c is color of that king
+	/*
+	**POS PASSED IN SHOULD BE 0-63**
+	pos of the king , c is color of that king
+	*/
 	Board all_possible_captures;
 	Piece temp;
-	for(int i = 0; i < 64; i++){
-		//if(c == WHITE){	idk if we actually need to check the color
-		//getting board of all possible opponent moves
+	int i;
+	for(i = 0; i < 64; i++){
+		/*
+		if(c == WHITE){	idk if we actually need to check the color
+		getting board of all possible opponent moves
+		*/
 		temp = get_piece_at(BIT(i), (1-c));
 		switch(temp){
 			case ROOK:
@@ -231,13 +258,13 @@ Bool king_is_checked(Pos pos, PlayerColor c){
 			case UNKNOWN:
 				break;
 		}
-		//}else{}	//black
+
 	}
-	//got a board with 1s in places where you can get captured
+	/*got a board with 1s in places where you can get captured*/
 	if(IS_SET(all_possible_captures, pos)){
-		return true;
+		return TRUE;
 	}
-	return false;
+	return FALSE;
 }
 
 /* Given a color, this function returns a singly linked list of all legal Moves with the head at *m.
@@ -248,43 +275,45 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 	/* TODO: Very unsure how **m works, what I wrote doesn't work but
 	 * I wanted to get my ideas down, we can discuss at meeting*/
  	unsigned int count = 0;
-	//make a head and assign m to point to head
+	/*make a head and assign m to point to head*/
 	Move *head = (Move *) malloc(sizeof(Move));
 	m = &head;
-	//use head_iterator to build up linked list
-	//NEVER MOVE HEAD since m is pointing to it so we always have a pointer to start of list
+	/*use head_iterator to build up linked list
+	NEVER MOVE HEAD since m is pointing to it so we always have a pointer to start of list*/
 	Move *head_iterator = head;
-	//not sure if this is right cause double pointers confuse me
 
-
-	for(int pos = 0; pos < 64; pos++){
+	int pos;
+	int i;
+	for(pos = 0; pos < 64; pos++){
 		if (IS_SET(player[c].k, pos)) {
 			Board king_moves = get_king_moves(pos,c);
-			for(int i = 0; i < 64; i++) {
+			for(i = 0; i < 64; i++) {
 				if(IS_SET(king_moves, i)) {
 					save_state();
-					make_move(c, pos); // need to restore since we're not actually moving here
+					Move *temp = (Move *) malloc(sizeof(Move));
+					temp->from = BIT(pos); /*64 bit with 1 in the posiiton pos*/
+					temp->to = BIT(i); /*64 bit with 1 in the position i*/
+					temp->piece = KING;
+					temp->promotion_choice = UNKNOWN;
+					make_move(temp, c); /* need to restore since we're not actually moving here*/
 					if(king_is_checked(pos, c) == TRUE) {
 						restore_state();
+						free(temp);
 						continue;
 					} else {
 						count++;
-						Move *temp = (Move *) malloc(sizeof(Move));
-						temp->from = BIT(pos); //64 bit with 1 in the posiiton pos
-						temp->to = BIT(i); //64 bit with 1 in the position i
-						temp->piece = KING;
-						temp->promotion_choice = UNKNOWN;
 						restore_state();
-						if (head == NULL) head = temp;	//THE ONE TIME WE SET HEAD // rest will be using head_iterator
+						if (head == NULL) head = temp;	/*THE ONE TIME WE SET HEAD, rest will be using head_iterator*/
 						else {
 							head_iterator->next_move = temp;
 							head_iterator = head_iterator->next_move;
-							//this if/else should be same for the rest of these -> if (IS_SET(player[c].r, pos)) ... if (IS_SET(player[c].q, pos)) ...
+							/*this if/else should be same for the rest of these -> if (IS_SET(player[c].r, pos)) ... if (IS_SET(player[c].q, pos)) ...
+*/
 						}
 					}
 				}
 			}
-		} // end of if (IS_SET(player[c].k, pos))
+		} /*end of if (IS_SET(player[c].k, pos))*/
 
 
 		/*if(get_piece(i) != ' '){
@@ -293,7 +322,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					char *temp;
 					temp[0] = FILE_OF(i);
 					temp[1] = RANK_OF(i);
-					m[x].from = temp; //Obviously doesn't work but this is my thought process
+					m[x].from = temp; Obviously doesn't work but this is my thought process
 					temp[0] = FILE_OF(NORTH_OF(i));
 					temp[1] = RANK_OF(NORTH_OF(i));
 					m[x].to = temp;
@@ -324,7 +353,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 				}
 			}
 			if(get_piece_at(i, BLACK) == PAWN){
-				//Same as with white but south instead of north and fix colors
+				Same as with white but south instead of north and fix colors
 			}
 		}*/
 	}
@@ -335,8 +364,10 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 /* Returns TRUE if the CurrentPlayer is under checkmate, FALSE otherwise. */
 Bool is_checkmate() {
     /* Your implementation */
-    if (legal_moves != TRUE) return TRUE;
-    return FALSE;
+/*
+	if (legal_moves != TRUE) return TRUE;
+    return FALSE;*/
+	return FALSE;
 }
 
 /* Validate a move and make it. Returns TRUE if successful, FALSE if not.
@@ -345,8 +376,8 @@ Bool is_checkmate() {
  */
 Bool validate_and_move(Move *move, char **msg, PlayerColor c, Pos *ep_sq) {
     /* Your implementation */
-
-//set castle_flags if rook/king is moving and ep_sq if pawn is moving
+	return TRUE;
+/*set castle_flags if rook/king is moving and ep_sq if pawn is moving*/
 
 }
 
@@ -355,6 +386,7 @@ Bool validate_and_move(Move *move, char **msg, PlayerColor c, Pos *ep_sq) {
 	/* 3 move repetition also covers perpetual check */
 Bool is_draw() {
     /* Your implementation */
+	return TRUE;
 }
 
 /* Returns the piece on a square belonging to player color c.
@@ -388,12 +420,13 @@ Piece get_piece_at(Board pos, PlayerColor c) {
 PlayerColor get_color_at(Pos pos){
     if((get_piece(pos) == 'R') || (get_piece(pos) == 'N') || (get_piece(pos) == 'B') || (get_piece(pos) == 'Q')
     || (get_piece(pos) == 'K') || (get_piece(pos) == 'P')) return WHITE;
-    else return BLAK;
+    else return BLACK;
 }
 
 /* Check if this move is trying to castle */
 unsigned int detect_castle_move(Move move, PlayerColor c) {
     /* Your implementation */
+	return 0;
 }
 
 /* Perform castling. Moves king and rook and resets castle flags */

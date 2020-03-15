@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 /* Types for position, board, error and boolean */
 typedef unsigned int 		Pos;
@@ -107,7 +109,7 @@ Bool run_mate1(Move *soln);
 /* temp global variables to save/load state with */
 extern Pos temp_ep_square;
 extern PlayerState temp_player[2];
-extern _PlayerColor temp_currentPlayer;
-//storing mode? it shouldnt change
+extern PlayerColor temp_currentPlayer;
+
 
 #endif
