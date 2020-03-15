@@ -296,9 +296,11 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					temp->piece = KING;
 					temp->promotion_choice = UNKNOWN;
 					make_move(temp, c); /* need to restore since we're not actually moving here*/
+					printf("ffffffffffffffffffffffffffffff\n");
 					if(king_is_checked(pos, c) == TRUE) {
 						restore_state();
 						free(temp);
+						printf("king is being checked \n");
 						continue;
 					} else {
 						count++;
@@ -357,8 +359,10 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 			}
 		}*/
 	}
-	if(count != 0) return TRUE;
+	return TRUE;
+/*	if(count != 0) return TRUE;
 	return FALSE;
+*/
 }
 
 /* Returns TRUE if the CurrentPlayer is under checkmate, FALSE otherwise. */

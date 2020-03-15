@@ -113,20 +113,26 @@ int main(int argc, char const *argv[]) {
   			printf("Error parsing input.\n");
   			return 0;
   		}
-        Move *moves;
+
+		
+        Move *moves = NULL;
         unsigned int count;
         Move *temp_head = moves;
-        if(legal_moves(&moves, CurrentPlayer, &count)){
+	Move *itr = moves;
+        if(legal_moves(&temp_head, CurrentPlayer, &count)){
             while(temp_head != NULL){
-                printf("FROM: %u\n", temp_head->from);
-                printf("TO: %u\n", temp_head->to);
-                printf("PIECE: %d\n", (int)temp_head->piece);
-                printf("PROMOTION PIECE: %d\n", (int)temp_head->promotion_choice);
+           	 printf("aaaaaaaaaaaaaaaaaaaaaaa\n");
+	        printf("FROM: %u\n", itr->from);
+                printf("TO: %u\n", itr->to);
+                printf("PIECE: %d\n", (int)itr->piece);
+                printf("PROMOTION PIECE: %d\n", (int)itr->promotion_choice);
                 printf("Number of moves in linked list: %d\n", count);
-                temp_head = temp_head->next_move;
+                itr = itr->next_move;
             }
+	    printf("aaaaaaaaaaaaaaaaaaaaaaa\n");
         }
 
+	
   		/*
   		if(mode == 1){
   			run_mate1();
