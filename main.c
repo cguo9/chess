@@ -116,22 +116,24 @@ int main(int argc, char const *argv[]) {
 
 		
         Move *moves = NULL;
-        unsigned int count;
-        Move *temp_head = moves;
-	Move *itr = moves;
-        if(legal_moves(&temp_head, CurrentPlayer, &count)){
-            while(temp_head != NULL){
-           	 printf("aaaaaaaaaaaaaaaaaaaaaaa\n");
-	        printf("FROM: %u\n", itr->from);
-                printf("TO: %u\n", itr->to);
+        unsigned int count = 0;
+        /* Move *temp_head = moves; */
+	Move *itr;
+        if(legal_moves(&moves, CurrentPlayer, &count)){
+            itr = moves;
+	    while(itr != NULL){
+	        printf("PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n",(int)itr->piece , itr->from, itr->to, 
+				(int)itr->promotion_choice);
+               /* printf("TO: %u", itr->to);
                 printf("PIECE: %d\n", (int)itr->piece);
                 printf("PROMOTION PIECE: %d\n", (int)itr->promotion_choice);
-                printf("Number of moves in linked list: %d\n", count);
+               */
                 itr = itr->next_move;
             }
-	    printf("aaaaaaaaaaaaaaaaaaaaaaa\n");
-        }
 
+	    printf("Number of moves in linked list: %d\n", count);
+        }
+/* NEED TO FREE THIS LINKED LIST BEFORE PARSING NEXT BOARD */
 	
   		/*
   		if(mode == 1){
@@ -141,7 +143,8 @@ int main(int argc, char const *argv[]) {
   		} */
   		/* store solution in result.txt*/
   		memset(board_str, 0, 150); /* reset everything for next puzzle */
-        int z;
+        	
+		int z;
   		for(z = 0; z < 2; z++){
   			player[z].r &= 0;
   			player[z].n &= 0;
