@@ -227,7 +227,7 @@ Bool king_is_checked(Pos pos, PlayerColor c){
 	**POS PASSED IN SHOULD BE 0-63**
 	pos of the king , c is color of that king
 	*/
-	Board all_possible_captures;
+	Board all_possible_captures = 0;
 	Piece temp;
 	int i;
 	for(i = 0; i < 64; i++){
@@ -235,31 +235,33 @@ Bool king_is_checked(Pos pos, PlayerColor c){
 		if(c == WHITE){	idk if we actually need to check the color
 		getting board of all possible opponent moves
 		*/
-		temp = get_piece_at(BIT(i), (1-c));
+		temp = get_piece_at(i, (1-c));
+		/*printf("Piece is: %d\n", temp); */
 		switch(temp){
 			case ROOK:
-				SET_BIT(all_possible_captures, get_rook_moves(BIT(i), 1-c));
+				SET_BIT(all_possible_captures, get_rook_moves(i, 1-c));
 				break;
 			case NIGHT:
-				SET_BIT(all_possible_captures, get_night_moves(BIT(i), 1-c));
+				SET_BIT(all_possible_captures, get_night_moves(i, 1-c));
 				break;
 			case BISHOP:
-				SET_BIT(all_possible_captures, get_bishop_moves(BIT(i), 1-c));
+				SET_BIT(all_possible_captures, get_bishop_moves(i, 1-c));
 				break;
 			case QUEEN:
-				SET_BIT(all_possible_captures, get_queen_moves(BIT(i), 1-c));
+				SET_BIT(all_possible_captures, get_queen_moves(i, 1-c));
 				break;
 			case KING:
-				SET_BIT(all_possible_captures, get_king_moves(BIT(i), 1-c));
+				SET_BIT(all_possible_captures, get_king_moves(i, 1-c));
 				break;
 			case PAWN:
-				SET_BIT(all_possible_captures, get_pawn_moves(BIT(i), 1-c));
+				SET_BIT(all_possible_captures, get_pawn_moves(i, 1-c));
 				break;
 			case UNKNOWN:
 				break;
 		}
 
 	}
+	printf("all-possible captures: %lu\n", all_possible_captures);
 	/*got a board with 1s in places where you can get captured*/
 	if(IS_SET(all_possible_captures, pos)){
 		return TRUE;
@@ -276,12 +278,15 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 	 * I wanted to get my ideas down, we can discuss at meeting*/
  	unsigned int count = 0;
 	/*make a head and assign m to point to head*/
-	Move *head = (Move *) malloc(sizeof(Move));
+/*	Move *head = (Move *) malloc(sizeof(Move));
 	m = &head;
+*/
 	/*use head_iterator to build up linked list
 	NEVER MOVE HEAD since m is pointing to it so we always have a pointer to start of list*/
-	Move *head_iterator = head;
-
+/*	Move *head_iterator = &m;
+*/
+	Move *head_iterator = *m;
+	
 	int pos;
 	int i;
 	for(pos = 0; pos < 64; pos++){
@@ -291,8 +296,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 				if(IS_SET(king_moves, i)) {
 					save_state();
 					Move *temp = (Move *) malloc(sizeof(Move));
-					temp->from = BIT(pos); /*64 bit with 1 in the posiiton pos*/
-					temp->to = BIT(i); /*64 bit with 1 in the position i*/
+					temp->from = pos; /*64 bit with 1 in the posiiton pos*/
+					temp->to = i; /*64 bit with 1 in the position i*/
 					temp->piece = KING;
 					temp->promotion_choice = UNKNOWN;
 					make_move(temp, c); /* need to restore since we're not actually moving here*/
@@ -303,10 +308,14 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						printf("king is being checked \n");
 						continue;
 					} else {
+						printf("TEMP MOVE TO: %u\n", temp->to);
 						count++;
 						restore_state();
-						if (head == NULL) head = temp;	/*THE ONE TIME WE SET HEAD, rest will be using head_iterator*/
-						else {
+						if (head_iterator == NULL) {
+							head_iterator = temp;
+							
+/*THE ONE TIME WE SET HEAD, rest will be using head_iterator*/
+						}else {
 							head_iterator->next_move = temp;
 							head_iterator = head_iterator->next_move;
 							/*this if/else should be same for the rest of these -> if (IS_SET(player[c].r, pos)) ... if (IS_SET(player[c].q, pos)) ...
