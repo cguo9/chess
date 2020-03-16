@@ -87,29 +87,51 @@ Board get_king_moves(Pos pos, PlayerColor c) {
 
 	Board king_board = BIT(pos);
 	/*check if the direction is not out of board and if not occupied*/
-	if((NORTH_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(NORTH_OF(pos)))) {
-		SET_BIT(king_board, NORTH_OF(pos));
+	if((NORTH_OF(pos) != UNKNOWN_POS)) {
+		/*
+		if unoccupied then can set
+					OR
+		if occupied by opponent piece, can set
+		if occupied by your own color piece, CANNOT set
+		*/
+		if( (UNOCCUPIED(NORTH_OF(pos))) || ( (get_piece_at(NORTH_OF(pos), 1-c) != UNKNOWN) )){
+			SET_BIT(king_board, NORTH_OF(pos));
+		}
 	}
-	if((SOUTH_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(SOUTH_OF(pos)))) {
-		SET_BIT(king_board, SOUTH_OF(pos));
+	if((SOUTH_OF(pos) != UNKNOWN_POS)) {
+		if( (UNOCCUPIED(SOUTH_OF(pos))) || ( (get_piece_at(SOUTH_OF(pos), 1-c) != UNKNOWN) )){
+			SET_BIT(king_board, SOUTH_OF(pos));
+		}
 	}
-	if((WEST_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(WEST_OF(pos)))){
-		SET_BIT(king_board, WEST_OF(pos));
+	if((WEST_OF(pos) != UNKNOWN_POS)){
+		if( (UNOCCUPIED(WEST_OF(pos))) || ( (get_piece_at(WEST_OF(pos), 1-c) != UNKNOWN) )){
+			SET_BIT(king_board, WEST_OF(pos));
+		}
 	}
-	if((EAST_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(EAST_OF(pos)))) {
-		SET_BIT(king_board, EAST_OF(pos));
+	if((EAST_OF(pos) != UNKNOWN_POS)) {
+		if( (UNOCCUPIED(EAST_OF(pos))) || ( (get_piece_at(EAST_OF(pos), 1-c) != UNKNOWN) )){
+			SET_BIT(king_board, EAST_OF(pos));
+		}
 	}
-	if((NW_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(NW_OF(pos)))){
-		SET_BIT(king_board, NW_OF(pos));
+	if((NW_OF(pos) != UNKNOWN_POS)){
+		if( (UNOCCUPIED(NW_OF(pos))) || ( (get_piece_at(NW_OF(pos), 1-c) != UNKNOWN) )){
+			SET_BIT(king_board, NW_OF(pos));
+		}
 	}
-	if((NE_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(NE_OF(pos)))){
-		SET_BIT(king_board, NE_OF(pos));
+	if((NE_OF(pos) != UNKNOWN_POS)){
+		if( (UNOCCUPIED(NE_OF(pos))) || ( (get_piece_at(NE_OF(pos), 1-c) != UNKNOWN) )){
+			SET_BIT(king_board, NE_OF(pos));
+		}
 	}
-	if((SW_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(SW_OF(pos)))){
-		SET_BIT(king_board, SW_OF(pos));
+	if((SW_OF(pos) != UNKNOWN_POS)){
+		if( (UNOCCUPIED(SW_OF(pos))) || ( (get_piece_at(SW_OF(pos), 1-c) != UNKNOWN) )){
+			SET_BIT(king_board, SW_OF(pos));
+		}
 	}
-	if((SE_OF(pos) != UNKNOWN_POS) && (UNOCCUPIED(SE_OF(pos)))){
-		SET_BIT(king_board, SE_OF(pos));
+	if((SE_OF(pos) != UNKNOWN_POS)){
+		if( (UNOCCUPIED(SE_OF(pos))) || ( (get_piece_at(SE_OF(pos), 1-c) != UNKNOWN) )){
+			SET_BIT(king_board, SE_OF(pos));
+		}
 	}
 	/*also need to set all castle_flags to NO_CASTLE*/
 	/*
@@ -242,41 +264,41 @@ Bool king_is_checked(Pos pos, PlayerColor c){
 				/* SET_BIT(all_possible_captures, get_rook_moves(i, 1-c));
 				*/
 
-				printf("Piece is: ROOK \n"); 
+				printf("Piece is: ROOK \n");
 				   break;
 			case NIGHT:
 				/* SET_BIT(all_possible_captures, get_night_moves(i, 1-c));
 				*/
 
-				printf("Piece is NIGHT \n"); 
+				printf("Piece is NIGHT \n");
 				   break;
 			case BISHOP:
 				/* SET_BIT(all_possible_captures, get_bishop_moves(i, 1-c));
 				*/
-			
-				printf("Piece is BISHOP\n"); 
+
+				printf("Piece is BISHOP\n");
 				   break;
 			case QUEEN:
 				/* SET_BIT(all_possible_captures, get_queen_moves(i, 1-c));
 				*/
-			
-				printf("Piece is QUEEN\n"); 
+
+				printf("Piece is QUEEN\n");
 				   break;
 			case KING:
-			/*	all_possible_captures |= (BIT(19));*/	   
+			/*	all_possible_captures |= (BIT(19));*/
 				all_possible_captures |= (get_king_moves(i, 1-c));
-			
-			/*	
+
+			/*
 				printf("position of opposing piece: %d\n", i);
-				printf("KING and:  board is ");    
-			       	printf("~~~~ %lu ~~~~\n", (get_king_moves(i, 1-c)) );	
-			*/	
+				printf("KING and:  board is ");
+			       	printf("~~~~ %lu ~~~~\n", (get_king_moves(i, 1-c)) );
+			*/
 			     	break;
 			case PAWN:
 				/* SET_BIT(all_possible_captures, get_pawn_moves(i, 1-c));
 				*/
-			
-				printf("Piece is PAWN\n"); 
+
+				printf("Piece is PAWN\n");
 				   break;
 			case UNKNOWN:
 				break;
@@ -307,11 +329,11 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 /*	Move *head_iterator = &m;
 
 	Move *head_iterator = *m;
-*/	
+*/
 	int pos;
 	int i;
 	Move *head = NULL;
-	
+
 	for(pos = 0; pos < 64; pos++){
 		if (IS_SET(player[c].k, pos)) {
 			Board king_moves = get_king_moves(pos,c);
@@ -328,7 +350,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						restore_state();
 						free(temp);
 						printf("king is being checked \n");
-					
+
 						continue;
 					} else {
 						/*printf("TEMP MOVE TO: %u\n", temp->to); */
@@ -337,7 +359,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						if ((*m) == NULL) {
 							(*m) = temp;
 							head = temp;
-							/* printf("setting as head\n");*/	
+							/* printf("setting as head\n");*/
 /*THE ONE TIME WE SET HEAD, rest will be using head_iterator*/
 						}else {
 							(*m)->next_move = temp;
