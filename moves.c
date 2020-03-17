@@ -267,16 +267,16 @@ Board get_pawn_moves(Pos pos,PlayerColor c) {
 		}
 		pos = temp_pos;
 		/* regardless of position, check if it can move to a captured piece's position (diagonal capture) */
-		if((SOUTH_OF(EAST_OF(pos))) != UNKNOWN_POS) {
-			if(IS_SET(BOARD(player[1-c]), (SOUTH_OF(EAST_OF(pos)))) ){
+		if(SE_OF(pos) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[1-c]), (SE_OF(pos))) ){
 				/* if theres an opponent piece SE of the pawn, the pawn can move there */
-				SET_BIT(pawn_board, (SOUTH_OF(EAST_OF(pos))) );
+				SET_BIT(pawn_board, SE_OF(pos));
 			}
 		}
-		if((SOUTH_OF(WEST_OF(pos))) != UNKNOWN_POS) {
-			if(IS_SET(BOARD(player[1-c]), (SOUTH_OF(WEST_OF(pos)))) ){
+		if(SW_OF(pos) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[1-c]), (SW_OF(pos))){
 				/* if theres an opponent piece SW of the pawn, the pawn can move there */
-				SET_BIT(pawn_board, (SOUTH_OF(WEST_OF(pos))) );
+				SET_BIT(pawn_board, SW_OF(pos));
 			}
 		}
 	}
@@ -296,7 +296,54 @@ Board get_pawn_moves(Pos pos,PlayerColor c) {
 
 Board get_bishop_moves(Pos pos, PlayerColor c){
 	Board bishop_board = BIT(pos);
+	while(NE_OF(bishop_board) != UNKNOWN_POS) {
+		if(UNOCCUPIED(pos)){
+			SET_BIT(bishop_board, NE_OF(pos));
+		}else{
+			if(IS_SET(BOARD(player[c]), NE_OF(pos))){
+				break;
+			}else{	/*opponent piece is there*/
+				SET_BIT(bishop_board, NE_OF(pos));
+			}
+		}
+	}
 
+	while(NW_OF(bishop_board) != UNKNOWN_POS) {
+		if(UNOCCUPIED(pos)){
+			SET_BIT(bishop_board, NW_OF(pos));
+		}else{
+			if(IS_SET(BOARD(player[c]), NW_OF(pos))){
+				break;
+			}else{
+				SET_BIT(bishop_board, NW_OF(pos));
+			}
+		}
+	}
+
+	while(SE_OF(bishop_board) != UNKNOWN_POS) {
+		if(UNOCCUPIED(pos)){
+			SET_BIT(bishop_board, SE_OF(pos));
+		}else{
+			if(IS_SET(BOARD(player[c]), SE_OF(pos))){
+				break;
+			}else{
+				SET_BIT(bishop_board, SE_OF(pos));
+			}
+		}
+	}
+
+	while(SW_OF(bishop_board) != UNKNOWN_POS) {
+		if(UNOCCUPIED(pos)){
+			SET_BIT(bishop_board, SW_OF(pos));
+		}else{
+			if(IS_SET(BOARD(player[c]), SW_OF(pos))){
+				break;
+			}else{
+				SET_BIT(bishop_board, SW_OF(pos));
+			}
+		}
+	}
+	RESET_BIT(bishop_board, pos);
 	return bishop_board;
 }
 
