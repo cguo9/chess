@@ -246,7 +246,7 @@ Board get_pawn_moves(Pos pos,PlayerColor c) {
 		if((pos == 8) || (pos == 9) || (pos == 10) || (pos == 11) || (pos == 12) || (pos == 13)
 		|| (pos == 14) || (pos == 15)){
 			/* can move 1 or 2 spaces forward*/
-			if(WEST_OF(pos) != UNKNOWN_POS) {
+			if(SOUTH_OF(pos) != UNKNOWN_POS) {
 				if(UNOCCUPIED(SOUTH_OF(pos))){
 					SET_BIT(pawn_board, SOUTH_OF(pos));
 					pos = SOUTH_OF(pos);
@@ -259,9 +259,9 @@ Board get_pawn_moves(Pos pos,PlayerColor c) {
 			/* end if pos = starting square for black*/
 		}else{ /* pawn is not in a starting position can only move up 1*/
 			pos = temp_pos; /* just in case */
-			if(WEST_OF(pos) != UNKNOWN_POS) {
-				if(UNOCCUPIED(WEST_OF(pos))){
-					SET_BIT(pawn_board, WEST_OF(pos));
+			if(SOUTH_OF(pos) != UNKNOWN_POS) {
+				if(UNOCCUPIED(SOUTH_OF(pos))){
+					SET_BIT(pawn_board, SOUTH_OF(pos));
 				}
 			}
 		}
@@ -274,7 +274,7 @@ Board get_pawn_moves(Pos pos,PlayerColor c) {
 			}
 		}
 		if(SW_OF(pos) != UNKNOWN_POS) {
-			if(IS_SET(BOARD(player[1-c]), (SW_OF(pos))){
+			if(IS_SET(BOARD(player[1-c]), (SW_OF(pos)))){
 				/* if theres an opponent piece SW of the pawn, the pawn can move there */
 				SET_BIT(pawn_board, SW_OF(pos));
 			}
@@ -372,7 +372,7 @@ Bool king_is_checked(Pos pos, PlayerColor c){
 	Board all_possible_captures = 0;
 	Piece temp;
 	int i;
-	printf("Position of king: %u\n", pos);
+	/* printf("Position of king: %u\n", pos);*/
 	for(i = 0; i < 64; i++){
 		/*
 		if(c == WHITE){	idk if we actually need to check the color
@@ -413,7 +413,7 @@ Bool king_is_checked(Pos pos, PlayerColor c){
 		}
 
 	}
-	printf("all-possible captures: %lu\n", all_possible_captures);
+	/* printf("all-possible captures: %lu\n", all_possible_captures); */
 	/*got a board with 1s in places where you can get captured*/
 	if((IS_SET(all_possible_captures, pos)) == 1){
 		return TRUE;
@@ -442,6 +442,20 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 	int i;
 	Move *head = NULL;
 
+	int y;
+	int king_pos;
+	/* position of king on the board, so we can check if moving a piece allows your
+	king to be under check by opponent. Dont change this value.
+	*/
+	for(y = 0; y < 64; y++){
+		if (IS_SET(player[c].k, y)) {
+			/* assumes only 1 king on board*/
+			king_pos = y;
+		}
+	}
+
+
+
 	for(pos = 0; pos < 64; pos++){
 		if (IS_SET(player[c].k, pos)) {
 			Board king_moves = get_king_moves(pos,c);
@@ -449,15 +463,16 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 				if(IS_SET(king_moves, i)) {
 					save_state();
 					Move *temp = (Move *) malloc(sizeof(Move));
-					temp->from = pos; /*64 bit with 1 in the posiiton pos*/
-					temp->to = i; /*64 bit with 1 in the position i*/
+					temp->from = pos;
+					temp->to = i;
 					temp->piece = KING;
 					temp->promotion_choice = UNKNOWN;
 					make_move(temp, c); /* need to restore since we're not actually moving here*/
 					if(king_is_checked(i, c) == TRUE) {
+					/* every other piece uses king_is_checked(king_pos,c) */
 						restore_state();
 						free(temp);
-						printf("king is being checked \n");
+						printf("moving the king and the move results in us being checked \n");
 
 						continue;
 					} else {
@@ -479,6 +494,145 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 				}
 			}
 		} /*end of if (IS_SET(player[c].k, pos))*/
+
+
+		if (IS_SET(player[c].p, pos)) {
+			Board pawn_moves = get_pawn_moves(pos,c);
+			printf("pos; %d		board: %llu\n", pos, pawn_moves);
+			for(i = 0; i < 64; i++) {
+				if(IS_SET(pawn_moves, i)) {
+/*
+					if( ((c == WHITE) && ((i != 0) || (i != 1) || (i != 2) || (i != 3) || (i != 4) || (i != 5) || (i != 6) || (i != 7) ))
+						|| ((c == BLACK) && ((i != 56) || (i != 57) || (i != 58) || (i != 59) || (i != 60) || (i != 61) || (i != 62) || (i != 63)))
+					){
+					or
+					if(((c == BLACK) && ((pos != 48) || (pos != 49) || (pos != 50) || (pos != 51) || (pos != 52) || (pos != 53) || (pos != 54) || (pos != 55)))
+					||
+					((c == WHITE) && ((pos != 8) || (pos != 9) || (pos != 10) || (pos != 11) || (pos != 12) || (pos != 13) || (pos != 14) || (pos != 15)))){
+*/
+				/*not a promotional space for either white or black*/
+					printf("Position: %d ----> to pos: %d\n", pos, i);
+					Bool promo = FALSE;
+					if(c == WHITE){
+						promo = ((i != 0) && (i != 1) && (i != 2) && (i != 3) && (i != 4) && (i != 5) && (i != 6) && (i != 7));
+						promo = !promo;
+					}else if(c == BLACK){
+						promo = ((i != 56) && (i != 57) && (i != 58) && (i != 59) && (i != 60) && (i != 61) && (i != 62) && (i != 63));
+						promo = !promo;
+					}
+
+
+					if(promo == FALSE){
+						printf("not a promotion... \n");
+						save_state();
+						Move *temp = (Move *) malloc(sizeof(Move));
+						temp->from = pos;
+						temp->to = i;
+						temp->piece = PAWN;
+						temp->promotion_choice = UNKNOWN;
+						make_move(temp, c); /* need to restore since we're not actually moving here*/
+						if(king_is_checked(king_pos, c) == TRUE) {
+							restore_state();
+							free(temp);
+							printf("king is being checked when moving pawn \n");
+							continue;
+						} else {
+							(*pcount)++;
+							restore_state();
+							if ((*m) == NULL) {
+								(*m) = temp;
+								head = temp;
+							}else {
+								(*m)->next_move = temp;
+								(*m) = (*m)->next_move;
+							}
+						}
+					}else{ /* is a promotional space */
+						printf("promotional space yay \n");
+						save_state();
+						Move *temp = (Move *) malloc(sizeof(Move));
+						temp->from = pos;
+						temp->to = i;
+						temp->piece = PAWN;
+						temp->promotion_choice = ROOK;
+						make_move(temp, c); /* need to restore since we're not actually moving here*/
+						if(king_is_checked(king_pos, c) == TRUE) {
+							restore_state();
+							free(temp);
+							printf("king is being checked when promoting pawn \n");
+							/* only need to check once since same move but diff
+							promotion choice. should exit if moving the pawn up results in
+							your own king being checked */
+							continue;
+						} else {
+							(*pcount)++;
+							restore_state();
+							if ((*m) == NULL) {
+								(*m) = temp;
+								head = temp;
+							}else {
+								(*m)->next_move = temp;
+								(*m) = (*m)->next_move;
+							}
+						}
+						/* Continue storing the same move with diff promotion pieces */
+						save_state();
+						Move *temp2 = (Move *) malloc(sizeof(Move));
+						temp2->from = pos;
+						temp2->to = i;
+						temp2->piece = PAWN;
+						temp2->promotion_choice = NIGHT;
+						make_move(temp2, c);
+						(*pcount)++;
+						restore_state();
+						if ((*m) == NULL) {
+							(*m) = temp2;
+							head = temp2;
+						}else {
+							(*m)->next_move = temp2;
+							(*m) = (*m)->next_move;
+						}
+						/* Continue storing the same move with diff promotion pieces */
+						save_state();
+						Move *temp3 = (Move *) malloc(sizeof(Move));
+						temp3->from = pos;
+						temp3->to = i;
+						temp3->piece = PAWN;
+						temp3->promotion_choice = BISHOP;
+						make_move(temp3, c);
+						(*pcount)++;
+						restore_state();
+						if ((*m) == NULL) {
+							(*m) = temp3;
+							head = temp3;
+						}else {
+							(*m)->next_move = temp3;
+							(*m) = (*m)->next_move;
+						}
+						/* Continue storing the same move with diff promotion pieces */
+						save_state();
+						Move *temp4 = (Move *) malloc(sizeof(Move));
+						temp4->from = pos;
+						temp4->to = i;
+						temp4->piece = PAWN;
+						temp4->promotion_choice = QUEEN;
+						make_move(temp4, c);
+						(*pcount)++;
+						restore_state();
+						if ((*m) == NULL) {
+							(*m) = temp4;
+							head = temp4;
+						}else {
+							(*m)->next_move = temp4;
+							(*m) = (*m)->next_move;
+						}
+
+
+					} /* end of is promotional space */
+
+				} /* end of if(IS_SET(pawn_moves, i)) */
+			}
+		} /*end of if (IS_SET(player[c].p, pos))*/
 
 
 		/*if(get_piece(i) != ' '){
