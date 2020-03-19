@@ -3,46 +3,110 @@
 
 
 void save_state(){
-	memcpy(&temp_player, &player, sizeof(PlayerState));
+	/*memcpy(&temp_player, &player, sizeof(PlayerState));
 	memcpy(&temp_ep_square, &ep_square, sizeof(Pos));
-	memcpy(&temp_currentPlayer, &CurrentPlayer, sizeof(PlayerColor));
+	memcpy(&temp_currentPlayer, &CurrentPlayer, sizeof(PlayerColor));*/
+	temp_ep_square = ep_square;
+	temp_player[0] = player[0];
+	temp_player[1] = player[1];
+	temp_currentPlayer = CurrentPlayer;
 }
 
 void restore_state(){
-	memcpy(&ep_square, &temp_ep_square, sizeof(Pos));
+	/*memcpy(&ep_square, &temp_ep_square, sizeof(Pos));
 	memcpy(&CurrentPlayer, &temp_currentPlayer, sizeof(PlayerColor));
-	memcpy(&player, &temp_player, sizeof(PlayerState));
+	memcpy(&player, &temp_player, sizeof(PlayerState));*/
+	ep_square = temp_ep_square;
+	player[0] = temp_player[0];
+	player[1] = temp_player[1];
+	CurrentPlayer = temp_currentPlayer;
 }
 
 void capture_piece();
 
-/* clear bit of opponent piece, set bit of your piece at that position */
+/* clear bit of opponent piece, set bit of your piece at that position, check if any opponent pieces
+	where you are moving to, and if there is clear bit on the opponent piece's board
+ */
 
 void make_move(Move *m, PlayerColor c){
 	switch(m->piece){
 			case ROOK:
 				RESET_BIT(player[c].r,m->from);
 				SET_BIT(player[c].r,m->to);
+				switch(get_piece_at((BIT(m->to)), 1-c)){
+					case ROOK: RESET_BIT(player[1-c].r,m->to); break;
+					case KING: RESET_BIT(player[1-c].k,m->to); break;
+					case QUEEN: RESET_BIT(player[1-c].q,m->to); break;
+					case BISHOP: RESET_BIT(player[1-c].b,m->to); break;
+					case NIGHT: RESET_BIT(player[1-c].n,m->to); break;
+					case PAWN: RESET_BIT(player[1-c].p,m->to); break;
+					case UNKNOWN: break;
+				}
 				break;
 			case KING:
 				RESET_BIT(player[c].k,m->from);
 				SET_BIT(player[c].k,m->to);
+				switch(get_piece_at((BIT(m->to)), 1-c)){
+					case ROOK: RESET_BIT(player[1-c].r,m->to); break;
+					case KING: RESET_BIT(player[1-c].k,m->to); break;
+					case QUEEN: RESET_BIT(player[1-c].q,m->to); break;
+					case BISHOP: RESET_BIT(player[1-c].b,m->to); break;
+					case NIGHT: RESET_BIT(player[1-c].n,m->to); break;
+					case PAWN: RESET_BIT(player[1-c].p,m->to); break;
+					case UNKNOWN: break;
+				}
 				break;
 			case QUEEN:
 				RESET_BIT(player[c].q,m->from);
 				SET_BIT(player[c].q,m->to);
+				switch(get_piece_at((BIT(m->to)), 1-c)){
+					case ROOK: RESET_BIT(player[1-c].r,m->to); break;
+					case KING: RESET_BIT(player[1-c].k,m->to); break;
+					case QUEEN: RESET_BIT(player[1-c].q,m->to); break;
+					case BISHOP: RESET_BIT(player[1-c].b,m->to); break;
+					case NIGHT: RESET_BIT(player[1-c].n,m->to); break;
+					case PAWN: RESET_BIT(player[1-c].p,m->to); break;
+					case UNKNOWN: break;
+				}
 				break;
 			case BISHOP:
 				RESET_BIT(player[c].b,m->from);
 				SET_BIT(player[c].b,m->to);
+				switch(get_piece_at((BIT(m->to)), 1-c)){
+					case ROOK: RESET_BIT(player[1-c].r,m->to); break;
+					case KING: RESET_BIT(player[1-c].k,m->to); break;
+					case QUEEN: RESET_BIT(player[1-c].q,m->to); break;
+					case BISHOP: RESET_BIT(player[1-c].b,m->to); break;
+					case NIGHT: RESET_BIT(player[1-c].n,m->to); break;
+					case PAWN: RESET_BIT(player[1-c].p,m->to); break;
+					case UNKNOWN: break;
+				}
 				break;
 			case NIGHT:
 				RESET_BIT(player[c].n,m->from);
 				SET_BIT(player[c].n,m->to);
+				switch(get_piece_at((BIT(m->to)), 1-c)){
+					case ROOK: RESET_BIT(player[1-c].r,m->to); break;
+					case KING: RESET_BIT(player[1-c].k,m->to); break;
+					case QUEEN: RESET_BIT(player[1-c].q,m->to); break;
+					case BISHOP: RESET_BIT(player[1-c].b,m->to); break;
+					case NIGHT: RESET_BIT(player[1-c].n,m->to); break;
+					case PAWN: RESET_BIT(player[1-c].p,m->to); break;
+					case UNKNOWN: break;
+				}
 				break;
 			case PAWN:
 				RESET_BIT(player[c].p,m->from);
 				SET_BIT(player[c].p,m->to);
+				switch(get_piece_at((BIT(m->to)), 1-c)){
+					case ROOK: RESET_BIT(player[1-c].r,m->to); break;
+					case KING: RESET_BIT(player[1-c].k,m->to); break;
+					case QUEEN: RESET_BIT(player[1-c].q,m->to); break;
+					case BISHOP: RESET_BIT(player[1-c].b,m->to); break;
+					case NIGHT: RESET_BIT(player[1-c].n,m->to); break;
+					case PAWN: RESET_BIT(player[1-c].p,m->to); break;
+					case UNKNOWN: break;
+				}
 				break;
 			case UNKNOWN: break;
 
@@ -279,17 +343,78 @@ Board get_pawn_moves(Pos pos,PlayerColor c) {
 				SET_BIT(pawn_board, SW_OF(pos));
 			}
 		}
-	}
-	pos = temp_pos;
-	/* reset position for white just in case*/
-
+	}else{ 		/* c == WHITE */
+		pos = temp_pos;
+		if((pos == 48) || (pos == 49) || (pos == 50) || (pos == 51) || (pos == 52) || (pos == 53)
+		|| (pos == 54) || (pos == 55)){
+			/* can move 1 or 2 spaces forward*/
+			if(NORTH_OF(pos) != UNKNOWN_POS) {
+				if(UNOCCUPIED(NORTH_OF(pos))){
+					SET_BIT(pawn_board, NORTH_OF(pos));
+					pos = NORTH_OF(pos);
+					/* 2 squares are unoccupied */
+					if(UNOCCUPIED(NORTH_OF(pos))){
+						SET_BIT(pawn_board, NORTH_OF(pos));
+					}
+				} /* else if occupied directly infront the pawn cant move, do nothing */
+			}
+			/* end if pos = starting square for black*/
+		}else{ /* pawn is not in a starting position can only move up 1*/
+			pos = temp_pos; /* just in case */
+			if(NORTH_OF(pos) != UNKNOWN_POS) {
+				if(UNOCCUPIED(NORTH_OF(pos))){
+					SET_BIT(pawn_board, NORTH_OF(pos));
+				}
+			}
+		}
+		pos = temp_pos;
+		/* regardless of position, check if it can move to a captured piece's position (diagonal capture) */
+		if(NE_OF(pos) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[1-c]), (NE_OF(pos))) ){
+				/* if theres an opponent piece SE of the pawn, the pawn can move there */
+				SET_BIT(pawn_board, NE_OF(pos));
+			}
+		}
+		if(NW_OF(pos) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[1-c]), (NW_OF(pos)))){
+				/* if theres an opponent piece SW of the pawn, the pawn can move there */
+				SET_BIT(pawn_board, NW_OF(pos));
+			}
+		}
+	}	/* end c == WHITE */
 
 	if((ep_square >= 0) || (ep_square < 64)){
 		/* if enpassant is available, check if it is a legal move for the pawn
 			THERE CAN BE MULTIPLE PAWNS ON THE BOARD, CHECK IF THE EP_SQ IS FOR THIS SPECIFIC PAWN
 			THAT WE ARE GETTING VALID MOVES FOR
 		*/
+		if(c == BLACK){
+			/* for black, rank 3 should be valid enpassant to caputre white pawns */
+			if(NW_OF(ep_square) != UNKNOWN_POS){
+				if(pos == NW_OF(ep_square)){
+					SET_BIT(pawn_board, ep_square);
+				}
+			}
+			if(NE_OF(ep_square) != UNKNOWN_POS){
+				if(pos == NE_OF(ep_square)){
+					SET_BIT(pawn_board, ep_square);
+				}
+			}
+		}else{
+			/* for white, rank 6 should be valid enpassant to caputre black pawns */
+			if(SW_OF(ep_square) != UNKNOWN_POS){
+				if(pos == SW_OF(ep_square)){
+					SET_BIT(pawn_board, ep_square);
+				}
+			}
+			if(SE_OF(ep_square) != UNKNOWN_POS){
+				if(pos == SE_OF(ep_square)){
+					SET_BIT(pawn_board, ep_square);
+				}
+			}
+		}
 	}
+
 	RESET_BIT(pawn_board, temp_pos);
 	return pawn_board;
 }
@@ -448,7 +573,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 	king to be under check by opponent. Dont change this value.
 	*/
 	for(y = 0; y < 64; y++){
-		if (IS_SET(player[c].k, y)) {
+		/* if (IS_SET(player[c].k, y)) { */
+		if (IS_SET(player[c].k, y) == 1) {
 			/* assumes only 1 king on board*/
 			king_pos = y;
 		}
@@ -457,10 +583,11 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 
 	for(pos = 0; pos < 64; pos++){
-		if (IS_SET(player[c].k, pos)) {
+		if (IS_SET(player[c].k, pos) == 1) {
 			Board king_moves = get_king_moves(pos,c);
 			for(i = 0; i < 64; i++) {
-				if(IS_SET(king_moves, i)) {
+				if(IS_SET(king_moves, i) == 1) {
+					/* printf("bit of king saved: %llu\n", player[c].k); */
 					save_state();
 					Move *temp = (Move *) malloc(sizeof(Move));
 					temp->from = pos;
@@ -477,7 +604,9 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						continue;
 					} else {
 						(*pcount)++; /*increment whats in pointer */
+						/* printf("bit of king after change: %llu\n", player[c].k); */
 						restore_state();
+						/* printf("bit of king after restore: %llu\n", player[c].k); */
 						if ((*m) == NULL) {
 							(*m) = temp;
 							head = temp;
@@ -498,7 +627,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 		if (IS_SET(player[c].p, pos)) {
 			Board pawn_moves = get_pawn_moves(pos,c);
-			printf("pos; %d		board: %llu\n", pos, pawn_moves);
+			/* printf("pos; %d		board: %llu\n", pos, pawn_moves); */
 			for(i = 0; i < 64; i++) {
 				if(IS_SET(pawn_moves, i)) {
 /*
@@ -511,7 +640,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					((c == WHITE) && ((pos != 8) || (pos != 9) || (pos != 10) || (pos != 11) || (pos != 12) || (pos != 13) || (pos != 14) || (pos != 15)))){
 */
 				/*not a promotional space for either white or black*/
-					printf("Position: %d ----> to pos: %d\n", pos, i);
+					/* printf("Position: %d ----> to pos: %d\n", pos, i); */
 					Bool promo = FALSE;
 					if(c == WHITE){
 						promo = ((i != 0) && (i != 1) && (i != 2) && (i != 3) && (i != 4) && (i != 5) && (i != 6) && (i != 7));
@@ -523,7 +652,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 
 					if(promo == FALSE){
-						printf("not a promotion... \n");
+						/* printf("not a promotion... \n"); */
 						save_state();
 						Move *temp = (Move *) malloc(sizeof(Move));
 						temp->from = pos;
