@@ -22,7 +22,6 @@ void restore_state(){
 	CurrentPlayer = temp_currentPlayer;
 }
 
-void capture_piece();
 
 /* clear bit of opponent piece, set bit of your piece at that position, check if any opponent pieces
 	where you are moving to, and if there is clear bit on the opponent piece's board
@@ -53,6 +52,28 @@ void make_move(Move *m, PlayerColor c){
 			case PAWN:
 				RESET_BIT(player[c].p,m->from);
 				SET_BIT(player[c].p,m->to);
+				switch(m->promotion_choice){
+					case ROOK:
+						RESET_BIT(player[c].p,m->to);
+						SET_BIT(player[c].r, m->to);
+						break;
+					case QUEEN:
+						RESET_BIT(player[c].p,m->to);
+						SET_BIT(player[c].q, m->to);
+						break;
+					case BISHOP:
+						RESET_BIT(player[c].p,m->to);
+						SET_BIT(player[c].b, m->to);
+						break;
+					case NIGHT:
+						RESET_BIT(player[c].p,m->to);
+						SET_BIT(player[c].n, m->to);
+						break;
+					/* promotion piece should never be pawn or king */
+					case PAWN: break;
+					case KING: break;
+					case UNKNOWN: break;
+				}
 				break;
 			case UNKNOWN: break;
 
@@ -158,8 +179,7 @@ Board get_king_moves(Pos pos, PlayerColor c) {
 }
 
 Board get_rook_moves(Pos pos,PlayerColor c) {
-	/*check for your colored pieces if they are in the way. Check opponent colors for possible capture.
-*/
+	/*check for your colored pieces if they are in the way. Check opponent colors for possible capture. */
 	Board rook_board = BIT(pos);
 	/* need to change position in these while loops so its not infinite loops
 	ie. if pos was 16, NORTH_OF(16) is 8 then we need to check if NORTH_OF(8) is valid and it is, 0, so
@@ -224,15 +244,6 @@ Board get_rook_moves(Pos pos,PlayerColor c) {
 			}
 		}
 	}
-	/*
-	if((player[c].castle_flags == CASTLE_KING)){
-		SET_BIT(rook_board, BIT((pos-2)));
-		player[c].castle_flags = NO_CASTLE;
-	}else if ((player[c].castle_flags == CASTLE_QUEEN)){
-		SET_BIT(rook_board, BIT((pos+3)));
-		player[c].castle_flags = NO_CASTLE;
-	}
-	*/
 	RESET_BIT(rook_board, temp_pos);
 	return rook_board;
 
@@ -419,7 +430,7 @@ Board get_queen_moves(Pos pos, PlayerColor c){
 
 Board get_night_moves(Pos pos, PlayerColor c){
 	Board night_board = BIT(pos);
-	Pos temp_pos = pos;
+	/* Pos temp_pos = pos; */
 	while(NORTH_OF(NW_OF(night_board)) != UNKNOWN_POS) {
 		if(IS_SET(BOARD(player[c]), NORTH_OF(NW_OF(night_board)))) {
 			/* if your own piece is there, you cannot set, otherwise, its either unoccupied or opponent piece */
@@ -584,6 +595,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 
 	for(pos = 0; pos < 64; pos++){
+
 		if (IS_SET(player[c].k, pos) == 1) {
 			Board king_moves = get_king_moves(pos,c);
 			for(i = 0; i < 64; i++) {
@@ -764,6 +776,53 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 			}
 		} /*end of if (IS_SET(player[c].p, pos))*/
 
+		if (IS_SET(player[c].r, pos)) {
+			Board rook_moves = get_rook_moves(pos,c);
+			for(i = 0; i < 64; i++) {
+				if(IS_SET(rook_moves, i) == 1) {
+					save_state();
+					Move *temp = (Move *) malloc(sizeof(Move));
+					temp->from = pos;
+					temp->to = i;
+					temp->piece = ROOK;
+					temp->promotion_choice = UNKNOWN;
+					make_move(temp, c); /* need to restore since we're not actually moving here*/
+					if(king_is_checked(king_pos, c) == TRUE) {
+					/* every other piece uses king_is_checked(king_pos,c) */
+						restore_state();
+						free(temp);
+						printf("moving the rook and the move results in our king being checked \n");
+						continue;
+					} else {
+						(*pcount)++;
+						restore_state();
+						if ((*m) == NULL) {
+							(*m) = temp;
+							head = temp;
+						}else {
+							(*m)->next_move = temp;
+							(*m) = (*m)->next_move;
+						}
+					}
+				}
+			}
+		} /*end of if (IS_SET(player[c].r, pos))*/
+
+
+		if (IS_SET(player[c].n, pos)) {
+
+		} /*end of if (IS_SET(player[c].n, pos))*/
+
+
+		if (IS_SET(player[c].b, pos)) {
+
+		} /*end of if (IS_SET(player[c].b, pos))*/
+
+
+		if (IS_SET(player[c].q, pos)) {
+
+		} /*end of if (IS_SET(player[c].q, pos))*/
+
 
 		/*if(get_piece(i) != ' '){
 			if(get_piece_at(i, WHITE) == PAWN){
@@ -897,6 +956,8 @@ unsigned int detect_castle_move(Move *move, PlayerColor c) {
 			return NO_CASTLE;
 		}
 	}
+	/* shouldnt ever reach here */
+	return NO_CASTLE;
 }
 
 /* Perform castling. Moves king and rook and resets castle flags */

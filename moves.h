@@ -27,8 +27,9 @@ Bool is_draw();
  * If there is no piece with color c, UNKNOWN is returned. */
 Piece get_piece_at(Board pos, PlayerColor c);
 
-/* Check if this move is trying to castle */
-unsigned int detect_castle_move(Move move, PlayerColor c);
+/* Check if this move is trying to castle
+unsigned int detect_castle_move(Move move, PlayerColor c); */
+unsigned int detect_castle_move(Move *move, PlayerColor c);
 
 /* Perform castling. Moves king and rook and resets castle flags */
 void perform_castle(unsigned int castle, PlayerColor c);
@@ -40,5 +41,12 @@ void restore_state(); /*restore all global variables*/
 void capture_piece(); /*clear bit of opponent piece, set bit of your piece at that position*/
 
 Bool king_is_checked(Pos pos, PlayerColor c); /*returns TRUE if king is under check, FALSE otherwise*/
+
+Board get_king_moves(Pos pos, PlayerColor c);
+Board get_rook_moves(Pos pos,PlayerColor c);
+Board get_pawn_moves(Pos pos,PlayerColor c);
+Board get_bishop_moves(Pos pos, PlayerColor c);
+Board get_queen_moves(Pos pos, PlayerColor c);
+Board get_night_moves(Pos pos, PlayerColor c);
 
 #endif
