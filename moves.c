@@ -419,6 +419,68 @@ Board get_queen_moves(Pos pos, PlayerColor c){
 
 Board get_night_moves(Pos pos, PlayerColor c){
 	Board night_board = BIT(pos);
+	Pos temp_pos = pos;
+	while(NORTH_OF(NW_OF(night_board)) != UNKNOWN_POS) {
+		if(IS_SET(BOARD(player[c]), NORTH_OF(NW_OF(night_board)))) {
+			/* if your own piece is there, you cannot set, otherwise, its either unoccupied or opponent piece */
+			break;
+		} else {
+				SET_BIT(night_board, NORTH_OF(NW_OF((pos))));
+		}
+	}
+	while(WEST_OF(NW_OF(night_board)) != UNKNOWN_POS) {
+		if(IS_SET(BOARD(player[c]), WEST_OF(NW_OF(night_board)))) {
+			break;
+		} else {
+				SET_BIT(night_board, WEST_OF(NW_OF((pos))));
+		}
+	}
+
+	while(NORTH_OF(NE_OF(night_board)) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[c]), NORTH_OF(NE_OF(night_board)))) {
+				break;
+			} else {
+					SET_BIT(night_board, NORTH_OF(NE_OF((pos))));
+			}
+		}
+	while(EAST_OF(NE_OF(night_board)) != UNKNOWN_POS) {
+				if(IS_SET(BOARD(player[c]), EAST_OF(NE_OF(night_board)))) {
+					break;
+				} else {
+						SET_BIT(night_board, EAST_OF(NE_OF((pos))));
+				}
+			}
+
+	while(SOUTH_OF(SW_OF(night_board)) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[c]), SOUTH_OF(SW_OF(night_board)))) {
+				break;
+			} else {
+					SET_BIT(night_board, SOUTH_OF(SW_OF((pos))));
+			}
+		}
+	while(WEST_OF(SW_OF(night_board)) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[c]), WEST_OF(SW_OF(night_board)))) {
+				break;
+			} else {
+					SET_BIT(night_board, WEST_OF(SW_OF((pos))));
+			}
+		}
+
+	while(SOUTH_OF(SE_OF(night_board)) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[c]), SOUTH_OF(SE_OF(night_board)))) {
+				break;
+			} else {
+					SET_BIT(night_board, SOUTH_OF(SE_OF((pos))));
+			}
+		}
+	while(EAST_OF(SE_OF(night_board)) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[c]), EAST_OF(SE_OF(night_board)))) {
+				break;
+			} else {
+					SET_BIT(night_board, EAST_OF(SE_OF((pos))));
+			}
+		}
+	RESET_BIT(night_board, pos);
 	return night_board;
 }
 
@@ -813,7 +875,7 @@ PlayerColor get_color_at(Pos pos){
 }
 
 /* Check if this move is trying to castle */
-unsigned int detect_castle_move(Move move, PlayerColor c) {
+unsigned int detect_castle_move(Move *move, PlayerColor c) {
     /* Your implementation */
 
 	if(c == BLACK){
@@ -825,7 +887,7 @@ unsigned int detect_castle_move(Move move, PlayerColor c) {
 			}
 			return NO_CASTLE;
 		}
-	}else (c == WHITE){
+	}else if (c == WHITE){
 		if(move->piece == KING){
 			if(move->from == WKING_START_POS && move->to == 62){
 				return CASTLE_KING;
