@@ -46,8 +46,8 @@ struct move {
 typedef struct move Move;
 
 #define MAX_STR_SIZE	255
-#define WKING_START_POS	3 /* TODO: Starting position for the white king */
-#define BKING_START_POS	59 /* TODO: Starting position for the black king */
+#define WKING_START_POS	60 /* TODO: Starting position for the white king */
+#define BKING_START_POS	4 /* TODO: Starting position for the black king */
 
 #define BIT(n) 			(1ULL << (n))
 #define SET_BIT(x, n)	((x) |= BIT((n)))

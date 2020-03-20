@@ -33,80 +33,26 @@ void make_move(Move *m, PlayerColor c){
 			case ROOK:
 				RESET_BIT(player[c].r,m->from);
 				SET_BIT(player[c].r,m->to);
-				switch(get_piece_at((BIT(m->to)), 1-c)){
-					case ROOK: RESET_BIT(player[1-c].r,m->to); break;
-					case KING: RESET_BIT(player[1-c].k,m->to); break;
-					case QUEEN: RESET_BIT(player[1-c].q,m->to); break;
-					case BISHOP: RESET_BIT(player[1-c].b,m->to); break;
-					case NIGHT: RESET_BIT(player[1-c].n,m->to); break;
-					case PAWN: RESET_BIT(player[1-c].p,m->to); break;
-					case UNKNOWN: break;
-				}
 				break;
 			case KING:
 				RESET_BIT(player[c].k,m->from);
 				SET_BIT(player[c].k,m->to);
-				switch(get_piece_at((BIT(m->to)), 1-c)){
-					case ROOK: RESET_BIT(player[1-c].r,m->to); break;
-					case KING: RESET_BIT(player[1-c].k,m->to); break;
-					case QUEEN: RESET_BIT(player[1-c].q,m->to); break;
-					case BISHOP: RESET_BIT(player[1-c].b,m->to); break;
-					case NIGHT: RESET_BIT(player[1-c].n,m->to); break;
-					case PAWN: RESET_BIT(player[1-c].p,m->to); break;
-					case UNKNOWN: break;
-				}
 				break;
 			case QUEEN:
 				RESET_BIT(player[c].q,m->from);
 				SET_BIT(player[c].q,m->to);
-				switch(get_piece_at((BIT(m->to)), 1-c)){
-					case ROOK: RESET_BIT(player[1-c].r,m->to); break;
-					case KING: RESET_BIT(player[1-c].k,m->to); break;
-					case QUEEN: RESET_BIT(player[1-c].q,m->to); break;
-					case BISHOP: RESET_BIT(player[1-c].b,m->to); break;
-					case NIGHT: RESET_BIT(player[1-c].n,m->to); break;
-					case PAWN: RESET_BIT(player[1-c].p,m->to); break;
-					case UNKNOWN: break;
-				}
 				break;
 			case BISHOP:
 				RESET_BIT(player[c].b,m->from);
 				SET_BIT(player[c].b,m->to);
-				switch(get_piece_at((BIT(m->to)), 1-c)){
-					case ROOK: RESET_BIT(player[1-c].r,m->to); break;
-					case KING: RESET_BIT(player[1-c].k,m->to); break;
-					case QUEEN: RESET_BIT(player[1-c].q,m->to); break;
-					case BISHOP: RESET_BIT(player[1-c].b,m->to); break;
-					case NIGHT: RESET_BIT(player[1-c].n,m->to); break;
-					case PAWN: RESET_BIT(player[1-c].p,m->to); break;
-					case UNKNOWN: break;
-				}
 				break;
 			case NIGHT:
 				RESET_BIT(player[c].n,m->from);
 				SET_BIT(player[c].n,m->to);
-				switch(get_piece_at((BIT(m->to)), 1-c)){
-					case ROOK: RESET_BIT(player[1-c].r,m->to); break;
-					case KING: RESET_BIT(player[1-c].k,m->to); break;
-					case QUEEN: RESET_BIT(player[1-c].q,m->to); break;
-					case BISHOP: RESET_BIT(player[1-c].b,m->to); break;
-					case NIGHT: RESET_BIT(player[1-c].n,m->to); break;
-					case PAWN: RESET_BIT(player[1-c].p,m->to); break;
-					case UNKNOWN: break;
-				}
 				break;
 			case PAWN:
 				RESET_BIT(player[c].p,m->from);
 				SET_BIT(player[c].p,m->to);
-				switch(get_piece_at((BIT(m->to)), 1-c)){
-					case ROOK: RESET_BIT(player[1-c].r,m->to); break;
-					case KING: RESET_BIT(player[1-c].k,m->to); break;
-					case QUEEN: RESET_BIT(player[1-c].q,m->to); break;
-					case BISHOP: RESET_BIT(player[1-c].b,m->to); break;
-					case NIGHT: RESET_BIT(player[1-c].n,m->to); break;
-					case PAWN: RESET_BIT(player[1-c].p,m->to); break;
-					case UNKNOWN: break;
-				}
 				break;
 			case UNKNOWN: break;
 
@@ -197,23 +143,16 @@ Board get_king_moves(Pos pos, PlayerColor c) {
 			SET_BIT(king_board, SE_OF(pos));
 		}
 	}
-/*also need to set all castle_flags to NO_CASTLE
 
-	i think we need to set_bit for possible castling here but then we would have to save state before we call get_king_moves()
-	or we can set bit here and somehow reset the castle_flags in a later function?
-	but then we would need a way to check if we were making a castling move
-	(we could make a global variable for that)
-*/
 
-	/*
 	if((player[c].castle_flags == CASTLE_KING)){
 		SET_BIT(king_board, BIT((pos+2)));
-		player[c].castle_flags = NO_CASTLE;
+		/* player[c].castle_flags = NO_CASTLE; */
 	}else if ((player[c].castle_flags == CASTLE_QUEEN)){
 		SET_BIT(king_board, BIT((pos-3)));
-		player[c].castle_flags = NO_CASTLE;
+		/* player[c].castle_flags = NO_CASTLE; */
 	}
-	*/
+
 	RESET_BIT(king_board, pos);
 	return king_board;
 }
@@ -876,10 +815,61 @@ PlayerColor get_color_at(Pos pos){
 /* Check if this move is trying to castle */
 unsigned int detect_castle_move(Move move, PlayerColor c) {
     /* Your implementation */
-	return 0;
+
+	if(c == BLACK){
+		if(move->piece == KING){
+			if(move->from == BKING_START_POS && move->to == 7){
+				return CASTLE_KING;
+			}else if(move->from == BKING_START_POS && move->to == 1){
+				return CASTLE_QUEEN;
+			}
+			return NO_CASTLE;
+		}
+	}else (c == WHITE){
+		if(move->piece == KING){
+			if(move->from == WKING_START_POS && move->to == 62){
+				return CASTLE_KING;
+			}else if(move->from == WKING_START_POS && move->to == 57){
+				return CASTLE_QUEEN;
+			}
+			return NO_CASTLE;
+		}
+	}
 }
 
 /* Perform castling. Moves king and rook and resets castle flags */
 void perform_castle(unsigned int castle, PlayerColor c) {
     /* Your implementation */
+	if(castle == CASTLE_KING){
+		if(c == BLACK){
+			RESET_BIT(player[c].k, BKING_START_POS);
+			SET_BIT(player[c].k, BKING_START_POS+2);
+			RESET_BIT(player[c].r, 7);
+			SET_BIT(player[c].r, 5);
+		}else if (c == WHITE){
+			RESET_BIT(player[c].k, WKING_START_POS);
+			SET_BIT(player[c].k, WKING_START_POS+2);
+			RESET_BIT(player[c].r, 63);
+			SET_BIT(player[c].r, 61);
+		}
+
+		player[c].castle_flags = NO_CASTLE;
+	}else if(castle == CASTLE_QUEEN){
+		if(c == BLACK){
+			RESET_BIT(player[c].k, BKING_START_POS);
+			SET_BIT(player[c].k, BKING_START_POS-3);
+			RESET_BIT(player[c].r, 0);
+			SET_BIT(player[c].r, 2);
+		}else if (c == WHITE){
+			RESET_BIT(player[c].k, WKING_START_POS);
+			SET_BIT(player[c].k, WKING_START_POS-3);
+			RESET_BIT(player[c].r, 56);
+			SET_BIT(player[c].r, 58);
+		}
+
+		player[c].castle_flags = NO_CASTLE;
+	}else if (castle == NO_CASTLE){
+		/* do nothing
+but when calling this function, wrap in if(!= NO_CASTLE) */
+	}
 }
