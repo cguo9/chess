@@ -871,12 +871,33 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 }
 
-/* Returns TRUE if the CurrentPlayer is under checkmate, FALSE otherwise. */
+/* Returns TRUE if the opponent of CurrentPlayer is under checkmate, FALSE otherwise. */
 Bool is_checkmate() {
-    /* Your implementation */
-/*
-	if (legal_moves != TRUE) return TRUE;
-    return FALSE;*/
+	/* if king is undercheck and has no moves it can make to get out of check
+     kings_pos is position of opponent king
+
+     if king is checked and no legal moves left for opponent then it is checkmate
+     else  their king is under check but they can still move somewhere
+    */
+
+	int a;
+	Pos kings_pos;
+	for(a = 0; a < 64; a++){
+		if(IS_SET(player[1-CurrentPlayer].k, a) == 1){
+			kings_pos = a;
+			break;
+		}
+	}
+	if(king_is_checked(kings_pos, 1-CurrentPlayer)){
+		Move *moves = NULL;
+		unsigned int moves_can_make = 0;
+		if(legal_moves(&moves, 1-CurrentPlayer, &moves_can_make) == FALSE){
+			return TRUE;
+		}else{
+			return FALSE;
+		}
+	}
+
 	return FALSE;
 }
 
@@ -895,8 +916,25 @@ Bool validate_and_move(Move *move, char **msg, PlayerColor c, Pos *ep_sq) {
 /* Draw can be due to insufficient material, 3 move repetition or stalemate */
 	/* 3 move repetition also covers perpetual check */
 Bool is_draw() {
-    /* Your implementation */
-	return TRUE;
+	/* stalemate if opponent king not checked and we ran out of legal moves?
+		maybe pass in our moves LL and check if its null inside the if opponent king is not checked
+	*/
+	int a;
+	Pos kings_pos;
+	for(a = 0; a < 64; a++){
+		if(IS_SET(player[1-CurrentPlayer].k, a) == 1){
+			kings_pos = a;
+			break;
+		}
+	}
+
+	if(king_is_checked(kings_pos, 1-CurrentPlayer) == FALSE){
+		 /* if CurrentPlayer has no moves left */
+		return TRUE;
+	}
+
+	return FALSE;
+	/*return TRUE;*/
 }
 
 /* Returns the piece on a square belonging to player color c.

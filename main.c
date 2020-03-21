@@ -114,36 +114,55 @@ int main(int argc, char const *argv[]) {
   			return 0;
   		}
 
-		
+
         Move *moves = NULL;
         unsigned int count = 0;
         /* Move *temp_head = moves; */
-	Move *itr;
-        if(legal_moves(&moves, CurrentPlayer, &count)){
+	    Move *itr;
+        if(legal_moves(&moves, CurrentPlayer, &count) == TRUE){
+            printf("Number of moves in linked list: %d\n", count);
             itr = moves;
-	    while(itr != NULL){
-	        printf("PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n",(int)itr->piece , itr->from, itr->to, 
-				(int)itr->promotion_choice);
-               /* printf("TO: %u", itr->to);
-                printf("PIECE: %d\n", (int)itr->piece);
-                printf("PROMOTION PIECE: %d\n", (int)itr->promotion_choice);
-               */
+    	    while(itr != NULL){
+    	        printf("PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n",(int)itr->piece , itr->from, itr->to,
+    				(int)itr->promotion_choice);
                 itr = itr->next_move;
             }
-
-	    printf("Number of moves in linked list: %d\n", count);
+            printf("asdfawefawef\n");
+            printf("Nu435r34tf34tt: \n");
         }
 /* NEED TO FREE THIS LINKED LIST BEFORE PARSING NEXT BOARD */
-	
-  		/*
-  		if(mode == 1){
-  			run_mate1();
-  		}else{
-  			run_mate2();
-  		} */
+
+/*
+        Bool found_sol = FALSE;
+        if(mode == 1){
+            Move *moves = NULL;
+            unsigned int count = 0;
+            Move *itr;
+            if(legal_moves(&moves, CurrentPlayer, &count)){
+                itr = moves;
+                while(itr != NULL){
+                    if(run_mate1(itr) == TRUE){
+                        found_sol = TRUE;
+                        printf("CHECKMATE SOLUTION: Piece = %d  %d to %d", itr->piece, itr->from, itr->to);
+             put into solutions.txt later but print for now
+                        break;
+                    }else{
+             that move wasnt a mate in 1, keep checking moves
+                        itr = itr->next_move;
+                    }
+                }
+            }
+            if(found_sol == FALSE) printf("cannot find run_mate1 solution.\n");
+
+        }else if(mode == 2){
+            run_mate2();
+        }else{
+            printf("Invalid Mode (Must be 1 or 2).\n");
+        }
+*/
   		/* store solution in result.txt*/
   		memset(board_str, 0, 150); /* reset everything for next puzzle */
-        	
+
 		int z;
   		for(z = 0; z < 2; z++){
   			player[z].r &= 0;
