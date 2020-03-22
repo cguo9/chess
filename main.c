@@ -47,66 +47,11 @@ int main(int argc, char const *argv[]) {
   		/*assumes valid input  */
   		printf("string read = %s\n", board_str);
   		if(parse_board(board_str)){
-
   			display_board();
-
-
   			printf("Current Player: %d\n", CurrentPlayer);
   			printf("Castle flags for WHITE PLAYER: %d\n", player[WHITE].castle_flags);
   			printf("Castle flags for BLACK PLAYER: %d\n", player[BLACK].castle_flags);
   			printf("En Passant square: %d\n", ep_square);
-
-  /*	print statements to check if everything parsed correctly
-  			printf("White ROOK = %x	\n",player[WHITE].r );
-  			decToBinary(player[WHITE].r);
-  			printf("\n");
-
-  			printf("White Knight =	");
-  			decToBinary(player[WHITE].n);
-  			printf("\n");
-
-  			printf("White BISHOP =	%x", player[WHITE].b);
-  			decToBinary(player[WHITE].b);
-  			printf("\n");
-
-  			printf("White QUEEN = 	");
-  			decToBinary(player[WHITE].q);
-  			printf("\n");
-
-  			printf("White KING = 	");
-  			decToBinary(player[WHITE].k);
-  			printf("\n");
-
-  			printf("White PAWN = 	");
-  			decToBinary(player[WHITE].p);
-  			printf("\n");
-
-
-  			printf("BLACK ROOK = 	");
-  			decToBinary(player[BLACK].r);
-  			printf("\n");
-
-  			printf("BLACK Knight = 	");
-  			decToBinary(player[BLACK].n);
-  			printf("\n");
-
-  			printf("BLACK BISHOP = 	");
-  			decToBinary(player[BLACK].b);
-  			printf("\n");
-
-  			printf("BLACK QUEEN =	");
-  			decToBinary(player[BLACK].q);
-  			printf("\n");
-
-  			printf("BLACK KING =	");
-  			decToBinary(player[BLACK].k);
-  			printf("\n");
-
-  			printf("BLACK PAWN = 	");
-  			decToBinary(player[BLACK].p);
-  			printf("\n");
-  */
-
   			printf("done parsing.\n");
   			/*return 0; testing purposes */
   		}else{
@@ -119,6 +64,7 @@ int main(int argc, char const *argv[]) {
         unsigned int count = 0;
         /* Move *temp_head = moves; */
 	    Move *itr;
+        printf("================ Legal Moves for Current Player ==============\n");
         if(legal_moves(&moves, CurrentPlayer, &count) == TRUE){
             itr = moves;
     	    while(itr != NULL){
@@ -128,9 +74,12 @@ int main(int argc, char const *argv[]) {
             }
             printf("Number of moves in linked list: %d\n", count);
         }
+
 /* NEED TO FREE THIS LINKED LIST BEFORE PARSING NEXT BOARD */
 
-/*
+        printf("================ Making moves and determining if checkmate ==============\n");
+        /* temporarily, actually suppsoed to be argv[3]*/
+        mode = atoi(argv[2]);
         Bool found_sol = FALSE;
         if(mode == 1){
             Move *moves = NULL;
@@ -139,13 +88,19 @@ int main(int argc, char const *argv[]) {
             if(legal_moves(&moves, CurrentPlayer, &count)){
                 itr = moves;
                 while(itr != NULL){
-                    if(run_mate1(itr) == TRUE){
+                    /* if(run_mate1(itr) == TRUE){ */
+                    save_state();
+                    make_move(itr, CurrentPlayer);
+                    printf("\nMaking Move... Piece %d, %d to %d", itr->piece, itr->from, itr->to);
+                    if(is_checkmate(1-CurrentPlayer) == TRUE){
                         found_sol = TRUE;
-                        printf("CHECKMATE SOLUTION: Piece = %d  %d to %d", itr->piece, itr->from, itr->to);
-             put into solutions.txt later but print for now
+                        printf("CHECKMATE SOLUTION: Piece = %d  %d to %d\n", itr->piece, itr->from, itr->to);
+            /* put into solutions.txt later but print for now */
                         break;
                     }else{
-             that move wasnt a mate in 1, keep checking moves
+            /* that move wasnt a mate in 1, keep checking moves */
+                        printf("that wasnt checkmate....\n");
+                        restore_state();
                         itr = itr->next_move;
                     }
                 }
@@ -153,11 +108,11 @@ int main(int argc, char const *argv[]) {
             if(found_sol == FALSE) printf("cannot find run_mate1 solution.\n");
 
         }else if(mode == 2){
-            run_mate2();
+            /*run_mate2();*/
         }else{
             printf("Invalid Mode (Must be 1 or 2).\n");
         }
-*/
+
   		/* store solution in result.txt*/
   		memset(board_str, 0, 150); /* reset everything for next puzzle */
 
@@ -182,6 +137,9 @@ int main(int argc, char const *argv[]) {
 
   	return 0;
 }
+
+
+
 
 /* function to convert decimal to binary */
 /*

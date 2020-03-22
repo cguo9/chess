@@ -834,6 +834,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					make_move(temp, c); /* need to restore since we're not actually moving here*/
 					if(king_is_checked(king_pos, c) == TRUE) {
 					/* every other piece uses king_is_checked(king_pos,c) */
+
 						restore_state();
 						free(temp);
 						printf("moving the night and the move results in our king being checked \n");
@@ -927,7 +928,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 }
 
 /* Returns TRUE if the opponent of CurrentPlayer is under checkmate, FALSE otherwise. */
-Bool is_checkmate() {
+Bool is_checkmate(PlayerColor c) {
 	/* if king is undercheck and has no moves it can make to get out of check
      kings_pos is position of opponent king
 
@@ -938,19 +939,29 @@ Bool is_checkmate() {
 	int a;
 	Pos kings_pos;
 	for(a = 0; a < 64; a++){
-		if(IS_SET(player[1-CurrentPlayer].k, a) == 1){
+		if(IS_SET(player[c].k, a) == 1){
 			kings_pos = a;
 			break;
 		}
 	}
-	if(king_is_checked(kings_pos, 1-CurrentPlayer)){
+	
+	Move *moves = NULL;
+	unsigned int moves_can_make = 0;
+	if(king_is_checked(kings_pos, c)){
+		printf("!!! king is checked !!!\n");
+		if((legal_moves(&moves, c, &moves_can_make) == FALSE)){
+			printf("*** we have no legal moves ***\n");
+			return TRUE;
+		}
+		/*
 		Move *moves = NULL;
 		unsigned int moves_can_make = 0;
-		if(legal_moves(&moves, 1-CurrentPlayer, &moves_can_make) == FALSE){
+		if(legal_moves(&moves, c, &moves_can_make) == FALSE){
 			return TRUE;
 		}else{
 			return FALSE;
-		}
+		}*/
+
 	}
 
 	return FALSE;

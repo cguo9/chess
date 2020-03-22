@@ -10,7 +10,7 @@
 Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount);
 
 /* Returns TRUE if the CurrentPlayer is under checkmate, FALSE otherwise. */
-Bool is_checkmate();
+Bool is_checkmate(PlayerColor c);
 
 /* Validate a move and make it. Returns TRUE if successful, FALSE if not.
  *  Error message if any, are stored in *msg.
@@ -41,6 +41,8 @@ void restore_state(); /*restore all global variables*/
 void capture_piece(); /*clear bit of opponent piece, set bit of your piece at that position*/
 
 Bool king_is_checked(Pos pos, PlayerColor c); /*returns TRUE if king is under check, FALSE otherwise*/
+
+void make_move(Move *m, PlayerColor c);
 
 Board get_king_moves(Pos pos, PlayerColor c);
 Board get_rook_moves(Pos pos,PlayerColor c);
