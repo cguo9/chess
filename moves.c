@@ -430,63 +430,61 @@ Board get_queen_moves(Pos pos, PlayerColor c){
 
 Board get_night_moves(Pos pos, PlayerColor c){
 	Board night_board = BIT(pos);
-	/* Pos temp_pos = pos; */
-	while(NORTH_OF(NW_OF(night_board)) != UNKNOWN_POS) {
-		if(IS_SET(BOARD(player[c]), NORTH_OF(NW_OF(night_board)))) {
+
+	if(NORTH_OF(NW_OF(pos)) != UNKNOWN_POS) {
+		if(IS_SET(BOARD(player[c]), NORTH_OF(NW_OF(pos)))) {
 			/* if your own piece is there, you cannot set, otherwise, its either unoccupied or opponent piece */
-			break;
 		} else {
 				SET_BIT(night_board, NORTH_OF(NW_OF((pos))));
 		}
 	}
-	while(WEST_OF(NW_OF(night_board)) != UNKNOWN_POS) {
-		if(IS_SET(BOARD(player[c]), WEST_OF(NW_OF(night_board)))) {
-			break;
+	if(WEST_OF(NW_OF(pos)) != UNKNOWN_POS) {
+		if(IS_SET(BOARD(player[c]), WEST_OF(NW_OF(pos)))) {
 		} else {
 				SET_BIT(night_board, WEST_OF(NW_OF((pos))));
 		}
 	}
 
-	while(NORTH_OF(NE_OF(night_board)) != UNKNOWN_POS) {
-			if(IS_SET(BOARD(player[c]), NORTH_OF(NE_OF(night_board)))) {
-				break;
+	if(NORTH_OF(NE_OF(pos)) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[c]), NORTH_OF(NE_OF(pos)))) {
+
 			} else {
 					SET_BIT(night_board, NORTH_OF(NE_OF((pos))));
 			}
 		}
-	while(EAST_OF(NE_OF(night_board)) != UNKNOWN_POS) {
-				if(IS_SET(BOARD(player[c]), EAST_OF(NE_OF(night_board)))) {
-					break;
+	if(EAST_OF(NE_OF(pos)) != UNKNOWN_POS) {
+				if(IS_SET(BOARD(player[c]), EAST_OF(NE_OF(pos)))) {
+
 				} else {
 						SET_BIT(night_board, EAST_OF(NE_OF((pos))));
 				}
 			}
 
-	while(SOUTH_OF(SW_OF(night_board)) != UNKNOWN_POS) {
-			if(IS_SET(BOARD(player[c]), SOUTH_OF(SW_OF(night_board)))) {
-				break;
+	if(SOUTH_OF(SW_OF(pos)) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[c]), SOUTH_OF(SW_OF(pos)))) {
+
 			} else {
 					SET_BIT(night_board, SOUTH_OF(SW_OF((pos))));
 			}
 		}
-	while(WEST_OF(SW_OF(night_board)) != UNKNOWN_POS) {
-			if(IS_SET(BOARD(player[c]), WEST_OF(SW_OF(night_board)))) {
-				break;
+	if(WEST_OF(SW_OF(pos)) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[c]), WEST_OF(SW_OF(pos)))) {
+
 			} else {
 					SET_BIT(night_board, WEST_OF(SW_OF((pos))));
 			}
 		}
 
-	while(SOUTH_OF(SE_OF(night_board)) != UNKNOWN_POS) {
-			if(IS_SET(BOARD(player[c]), SOUTH_OF(SE_OF(night_board)))) {
-				break;
+	if(SOUTH_OF(SE_OF(pos)) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[c]), SOUTH_OF(SE_OF(pos)))) {
+
 			} else {
 					SET_BIT(night_board, SOUTH_OF(SE_OF((pos))));
 			}
 		}
-	while(EAST_OF(SE_OF(night_board)) != UNKNOWN_POS) {
-			if(IS_SET(BOARD(player[c]), EAST_OF(SE_OF(night_board)))) {
-				break;
+	if(EAST_OF(SE_OF(pos)) != UNKNOWN_POS) {
+			if(IS_SET(BOARD(player[c]), EAST_OF(SE_OF(pos)))) {
+
 			} else {
 					SET_BIT(night_board, EAST_OF(SE_OF((pos))));
 			}
@@ -810,7 +808,37 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 
 		if (IS_SET(player[c].n, pos)) {
-
+			printf("night pos on board %d\n",pos);
+			Board night_moves = get_night_moves(pos,c);
+			printf("night pos on board %llu\n",night_moves);
+			for(i = 0; i < 64; i++) {
+				if(IS_SET(night_moves, i) == 1) {
+					save_state();
+					Move *temp = (Move *) malloc(sizeof(Move));
+					temp->from = pos;
+					temp->to = i;
+					temp->piece = NIGHT;
+					temp->promotion_choice = UNKNOWN;
+					make_move(temp, c); /* need to restore since we're not actually moving here*/
+					if(king_is_checked(king_pos, c) == TRUE) {
+					/* every other piece uses king_is_checked(king_pos,c) */
+						restore_state();
+						free(temp);
+						printf("moving the night and the move results in our king being checked \n");
+						continue;
+					} else {
+						(*pcount)++;
+						restore_state();
+						if ((*m) == NULL) {
+							(*m) = temp;
+							head = temp;
+						}else {
+							(*m)->next_move = temp;
+							(*m) = (*m)->next_move;
+						}
+					}
+				}
+			}
 		} /*end of if (IS_SET(player[c].n, pos))*/
 
 

@@ -120,15 +120,13 @@ int main(int argc, char const *argv[]) {
         /* Move *temp_head = moves; */
 	    Move *itr;
         if(legal_moves(&moves, CurrentPlayer, &count) == TRUE){
-            printf("Number of moves in linked list: %d\n", count);
             itr = moves;
     	    while(itr != NULL){
     	        printf("PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n",(int)itr->piece , itr->from, itr->to,
     				(int)itr->promotion_choice);
                 itr = itr->next_move;
             }
-            printf("asdfawefawef\n");
-            printf("Nu435r34tf34tt: \n");
+            printf("Number of moves in linked list: %d\n", count);
         }
 /* NEED TO FREE THIS LINKED LIST BEFORE PARSING NEXT BOARD */
 
