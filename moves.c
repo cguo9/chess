@@ -12,6 +12,16 @@ void save_state(){
 	temp_currentPlayer = CurrentPlayer;
 }
 
+void save_state2(){
+	/*memcpy(&temp_player, &player, sizeof(PlayerState));
+	memcpy(&temp_ep_square, &ep_square, sizeof(Pos));
+	memcpy(&temp_currentPlayer, &CurrentPlayer, sizeof(PlayerColor));*/
+	temp_ep_square2 = ep_square;
+	temp_player2[0] = player[0];
+	temp_player2[1] = player[1];
+	temp_currentPlayer2 = CurrentPlayer;
+}
+
 void restore_state(){
 	/*memcpy(&ep_square, &temp_ep_square, sizeof(Pos));
 	memcpy(&CurrentPlayer, &temp_currentPlayer, sizeof(PlayerColor));
@@ -22,6 +32,15 @@ void restore_state(){
 	CurrentPlayer = temp_currentPlayer;
 }
 
+void restore_state2(){
+	/*memcpy(&ep_square, &temp_ep_square, sizeof(Pos));
+	memcpy(&CurrentPlayer, &temp_currentPlayer, sizeof(PlayerColor));
+	memcpy(&player, &temp_player, sizeof(PlayerState));*/
+	ep_square = temp_ep_square2;
+	player[0] = temp_player2[0];
+	player[1] = temp_player2[1];
+	CurrentPlayer = temp_currentPlayer2;
+}
 
 /* clear bit of opponent piece, set bit of your piece at that position, check if any opponent pieces
 	where you are moving to, and if there is clear bit on the opponent piece's board
@@ -517,6 +536,7 @@ Bool king_is_checked(Pos pos, PlayerColor c){
 	pos of the king , c is color of that king
 	*/
 	Board all_possible_captures = 0;
+
 	Piece temp;
 	int i;
 	/* printf("Position of king: %u\n", pos);*/
@@ -529,22 +549,23 @@ Bool king_is_checked(Pos pos, PlayerColor c){
 		switch(temp){
 			case ROOK:
 				all_possible_captures |= (get_rook_moves(i, 1-c));
-				/*printf("Piece is: ROOK \n");*/
+
 				   break;
 			case NIGHT:
 				all_possible_captures |= (get_night_moves(i, 1-c));
-				/*printf("Piece is NIGHT \n");*/
+
 				   break;
 			case BISHOP:
 				all_possible_captures |= (get_bishop_moves(i, 1-c));
-				/*printf("Piece is BISHOP\n");*/
+
 				   break;
 			case QUEEN:
 				all_possible_captures |= (get_queen_moves(i, 1-c));
-				/*printf("Piece is QUEEN\n");*/
+
 				   break;
 			case KING:
 				all_possible_captures |= (get_king_moves(i, 1-c));
+
 			/*
 				printf("position of opposing piece: %d\n", i);
 				printf("KING and:  board is ");
@@ -553,16 +574,18 @@ Bool king_is_checked(Pos pos, PlayerColor c){
 			     	break;
 			case PAWN:
 				all_possible_captures |= (get_pawn_moves(i, 1-c));
-				/*printf("Piece is PAWN\n");*/
+
 				   break;
 			case UNKNOWN:
 				break;
 		}
 
 	}
+
 	/* printf("all-possible captures: %lu\n", all_possible_captures); */
 	/*got a board with 1s in places where you can get captured*/
 	if((IS_SET(all_possible_captures, pos)) == 1){
+		
 		return TRUE;
 	}
 	return FALSE;
@@ -939,20 +962,23 @@ Bool is_checkmate(PlayerColor c) {
 	int a;
 	Pos kings_pos;
 	for(a = 0; a < 64; a++){
-		if(IS_SET(player[c].k, a) == 1){
+		if(IS_SET(player[1-c].k, a) == 1){
 			kings_pos = a;
 			break;
 		}
 	}
-	
+	printf("opponent kings position: %d\n", kings_pos);
 	Move *moves = NULL;
 	unsigned int moves_can_make = 0;
-	if(king_is_checked(kings_pos, c)){
+	if(king_is_checked(kings_pos, 1-c)){
 		printf("!!! king is checked !!!\n");
-		if((legal_moves(&moves, c, &moves_can_make) == FALSE)){
+
+		if((legal_moves(&moves, 1-c, &moves_can_make) == FALSE)){
 			printf("*** we have no legal moves ***\n");
+
 			return TRUE;
 		}
+		restore_state();
 		/*
 		Move *moves = NULL;
 		unsigned int moves_can_make = 0;

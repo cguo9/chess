@@ -35,9 +35,9 @@ unsigned int detect_castle_move(Move *move, PlayerColor c);
 void perform_castle(unsigned int castle, PlayerColor c);
 
 void save_state(); /*save all global variables*/
-
+void save_state2();
 void restore_state(); /*restore all global variables*/
-
+void restore_state2();
 void capture_piece(); /*clear bit of opponent piece, set bit of your piece at that position*/
 
 Bool king_is_checked(Pos pos, PlayerColor c); /*returns TRUE if king is under check, FALSE otherwise*/
@@ -50,5 +50,7 @@ Board get_pawn_moves(Pos pos,PlayerColor c);
 Board get_bishop_moves(Pos pos, PlayerColor c);
 Board get_queen_moves(Pos pos, PlayerColor c);
 Board get_night_moves(Pos pos, PlayerColor c);
+
+
 
 #endif

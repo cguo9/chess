@@ -111,5 +111,9 @@ extern Pos temp_ep_square;
 extern PlayerState temp_player[2];
 extern PlayerColor temp_currentPlayer;
 
+extern Pos temp_ep_square2;
+extern PlayerState temp_player2[2];
+extern PlayerColor temp_currentPlayer2;
+
 
 #endif

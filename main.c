@@ -14,6 +14,10 @@ Mode mode;
 PlayerState temp_player[2];
 Pos temp_ep_square;
 PlayerColor temp_currentPlayer;
+
+PlayerState temp_player2[2];
+Pos temp_ep_square2;
+PlayerColor temp_currentPlayer2;
 /* used to test || delete later
 void decToBinary(int n);
 */
@@ -89,20 +93,21 @@ int main(int argc, char const *argv[]) {
                 itr = moves;
                 while(itr != NULL){
                     /* if(run_mate1(itr) == TRUE){ */
-                    save_state();
+
+                    save_state2();
                     make_move(itr, CurrentPlayer);
                     printf("\nMaking Move... Piece %d, %d to %d", itr->piece, itr->from, itr->to);
-                    if(is_checkmate(1-CurrentPlayer) == TRUE){
+                    /*if(is_checkmate(1-CurrentPlayer) == TRUE){*/
+                    if(is_checkmate(CurrentPlayer) == TRUE){
                         found_sol = TRUE;
                         printf("CHECKMATE SOLUTION: Piece = %d  %d to %d\n", itr->piece, itr->from, itr->to);
             /* put into solutions.txt later but print for now */
                         break;
-                    }else{
-            /* that move wasnt a mate in 1, keep checking moves */
-                        printf("that wasnt checkmate....\n");
-                        restore_state();
-                        itr = itr->next_move;
                     }
+                        printf("that wasnt checkmate....\n");
+                        restore_state2();
+
+                        itr = itr->next_move;
                 }
             }
             if(found_sol == FALSE) printf("cannot find run_mate1 solution.\n");
