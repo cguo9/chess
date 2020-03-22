@@ -585,7 +585,7 @@ Bool king_is_checked(Pos pos, PlayerColor c){
 	/* printf("all-possible captures: %lu\n", all_possible_captures); */
 	/*got a board with 1s in places where you can get captured*/
 	if((IS_SET(all_possible_captures, pos)) == 1){
-		
+
 		return TRUE;
 	}
 	return FALSE;
@@ -676,15 +676,6 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 			/* printf("pos; %d		board: %llu\n", pos, pawn_moves); */
 			for(i = 0; i < 64; i++) {
 				if(IS_SET(pawn_moves, i)) {
-/*
-					if( ((c == WHITE) && ((i != 0) || (i != 1) || (i != 2) || (i != 3) || (i != 4) || (i != 5) || (i != 6) || (i != 7) ))
-						|| ((c == BLACK) && ((i != 56) || (i != 57) || (i != 58) || (i != 59) || (i != 60) || (i != 61) || (i != 62) || (i != 63)))
-					){
-					or
-					if(((c == BLACK) && ((pos != 48) || (pos != 49) || (pos != 50) || (pos != 51) || (pos != 52) || (pos != 53) || (pos != 54) || (pos != 55)))
-					||
-					((c == WHITE) && ((pos != 8) || (pos != 9) || (pos != 10) || (pos != 11) || (pos != 12) || (pos != 13) || (pos != 14) || (pos != 15)))){
-*/
 				/*not a promotional space for either white or black*/
 					/* printf("Position: %d ----> to pos: %d\n", pos, i); */
 					Bool promo = FALSE;

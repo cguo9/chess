@@ -104,10 +104,8 @@ int main(int argc, char const *argv[]) {
             /* put into solutions.txt later but print for now */
                         break;
                     }
-                        printf("that wasnt checkmate....\n");
-                        restore_state2();
-
-                        itr = itr->next_move;
+                    restore_state2();
+                    itr = itr->next_move;
                 }
             }
             if(found_sol == FALSE) printf("cannot find run_mate1 solution.\n");
@@ -143,7 +141,10 @@ int main(int argc, char const *argv[]) {
   	return 0;
 }
 
+Bool run_mate1(Move *soln){
+    return FALSE;
 
+}
 
 
 /* function to convert decimal to binary */
