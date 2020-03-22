@@ -371,54 +371,66 @@ Board get_pawn_moves(Pos pos,PlayerColor c) {
 
 Board get_bishop_moves(Pos pos, PlayerColor c){
 	Board bishop_board = BIT(pos);
-	while(NE_OF(bishop_board) != UNKNOWN_POS) {
-		if(UNOCCUPIED(pos)){
+	Pos temp_pos = pos;
+	while(NE_OF(pos) != UNKNOWN_POS) {
+		if(UNOCCUPIED(NE_OF(pos))){
 			SET_BIT(bishop_board, NE_OF(pos));
+			pos = NE_OF(pos);
 		}else{
 			if(IS_SET(BOARD(player[c]), NE_OF(pos))){
 				break;
 			}else{	/*opponent piece is there*/
 				SET_BIT(bishop_board, NE_OF(pos));
+				break;
 			}
 		}
 	}
 
-	while(NW_OF(bishop_board) != UNKNOWN_POS) {
-		if(UNOCCUPIED(pos)){
+	pos = temp_pos;
+	while(NW_OF(pos) != UNKNOWN_POS) {
+		if(UNOCCUPIED(NW_OF(pos))){
 			SET_BIT(bishop_board, NW_OF(pos));
+			pos = NW_OF(pos);
 		}else{
 			if(IS_SET(BOARD(player[c]), NW_OF(pos))){
 				break;
 			}else{
 				SET_BIT(bishop_board, NW_OF(pos));
+				break;
 			}
 		}
 	}
 
-	while(SE_OF(bishop_board) != UNKNOWN_POS) {
-		if(UNOCCUPIED(pos)){
+	pos = temp_pos;
+	while(SE_OF(pos) != UNKNOWN_POS) {
+		if(UNOCCUPIED(SE_OF(pos))){
 			SET_BIT(bishop_board, SE_OF(pos));
+			pos = SE_OF(pos);
 		}else{
 			if(IS_SET(BOARD(player[c]), SE_OF(pos))){
 				break;
 			}else{
 				SET_BIT(bishop_board, SE_OF(pos));
+				break;
 			}
 		}
 	}
 
-	while(SW_OF(bishop_board) != UNKNOWN_POS) {
-		if(UNOCCUPIED(pos)){
+	pos = temp_pos;
+	while(SW_OF(pos) != UNKNOWN_POS) {
+		if(UNOCCUPIED(SW_OF(pos))){
 			SET_BIT(bishop_board, SW_OF(pos));
+			pos = SW_OF(pos);
 		}else{
 			if(IS_SET(BOARD(player[c]), SW_OF(pos))){
 				break;
 			}else{
 				SET_BIT(bishop_board, SW_OF(pos));
+				break;
 			}
 		}
 	}
-	RESET_BIT(bishop_board, pos);
+	RESET_BIT(bishop_board, temp_pos);
 	return bishop_board;
 }
 
@@ -808,9 +820,9 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 
 		if (IS_SET(player[c].n, pos)) {
-			printf("night pos on board %d\n",pos);
+			/* printf("night pos on board %d\n",pos); */
 			Board night_moves = get_night_moves(pos,c);
-			printf("night pos on board %llu\n",night_moves);
+			/* printf("night pos on board %llu\n",night_moves); */
 			for(i = 0; i < 64; i++) {
 				if(IS_SET(night_moves, i) == 1) {
 					save_state();
@@ -843,55 +855,70 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 
 		if (IS_SET(player[c].b, pos)) {
-
+			Board bishop_moves = get_bishop_moves(pos,c);
+			for(i = 0; i < 64; i++) {
+				if(IS_SET(bishop_moves, i) == 1) {
+					save_state();
+					Move *temp = (Move *) malloc(sizeof(Move));
+					temp->from = pos;
+					temp->to = i;
+					temp->piece = BISHOP;
+					temp->promotion_choice = UNKNOWN;
+					make_move(temp, c); /* need to restore since we're not actually moving here*/
+					if(king_is_checked(king_pos, c) == TRUE) {
+					/* every other piece uses king_is_checked(king_pos,c) */
+						restore_state();
+						free(temp);
+						printf("moving the bishop and the move results in our king being checked \n");
+						continue;
+					} else {
+						(*pcount)++;
+						restore_state();
+						if ((*m) == NULL) {
+							(*m) = temp;
+							head = temp;
+						}else {
+							(*m)->next_move = temp;
+							(*m) = (*m)->next_move;
+						}
+					}
+				}
+			}
 		} /*end of if (IS_SET(player[c].b, pos))*/
 
 
 		if (IS_SET(player[c].q, pos)) {
-
+			Board queen_moves = get_queen_moves(pos,c);
+			for(i = 0; i < 64; i++) {
+				if(IS_SET(queen_moves, i) == 1) {
+					save_state();
+					Move *temp = (Move *) malloc(sizeof(Move));
+					temp->from = pos;
+					temp->to = i;
+					temp->piece = QUEEN;
+					temp->promotion_choice = UNKNOWN;
+					make_move(temp, c); /* need to restore since we're not actually moving here*/
+					if(king_is_checked(king_pos, c) == TRUE) {
+					/* every other piece uses king_is_checked(king_pos,c) */
+						restore_state();
+						free(temp);
+						printf("moving the queen and the move results in our king being checked \n");
+						continue;
+					} else {
+						(*pcount)++;
+						restore_state();
+						if ((*m) == NULL) {
+							(*m) = temp;
+							head = temp;
+						}else {
+							(*m)->next_move = temp;
+							(*m) = (*m)->next_move;
+						}
+					}
+				}
+			}
 		} /*end of if (IS_SET(player[c].q, pos))*/
 
-
-		/*if(get_piece(i) != ' '){
-			if(get_piece_at(i, WHITE) == PAWN){
-				if(NORTH_OF(i) < 64 && UNOCCUPIED(NORTH_OF(i))){
-					char *temp;
-					temp[0] = FILE_OF(i);
-					temp[1] = RANK_OF(i);
-					m[x].from = temp; Obviously doesn't work but this is my thought process
-					temp[0] = FILE_OF(NORTH_OF(i));
-					temp[1] = RANK_OF(NORTH_OF(i));
-					m[x].to = temp;
-					m[x].piece = PAWN;
-					x++;
-				}
-				if(get_piece_at(NE_OF(i), BLACK) != UNKNOWN){
-					char *temp;
-					temp[0] = FILE_OF(i);
-					temp[1] = RANK_OF(i);
-					m[x].from = temp;
-					temp[0] = FILE_OF(NE_OF(i));
-					temp[1] = RANK_OF(NE_OF(i));
-					m[x].to = temp;
-					m[x].piece = PAWN;
-					x++;
-				}
-				if(get_piece_at(NW_OF(i), BLACK) != UNKNOWN){
-					char *temp;
-					temp[0] = FILE_OF(i);
-					temp[1] = RANK_OF(i);
-					m[x].from = temp;
-					temp[0] = FILE_OF(NW_OF(i));
-					temp[1] = RANK_OF(NW_OF(i));
-					m[x].to = temp;
-					m[x].piece = PAWN;
-					x++;
-				}
-			}
-			if(get_piece_at(i, BLACK) == PAWN){
-				Same as with white but south instead of north and fix colors
-			}
-		}*/
 	}
 	*m = head;
 	if((*pcount) > 0) return TRUE;
