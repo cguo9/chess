@@ -53,8 +53,13 @@ void make_move(Move *m, PlayerColor c){
 				SET_BIT(player[c].r,m->to);
 				break;
 			case KING:
-				RESET_BIT(player[c].k,m->from);
-				SET_BIT(player[c].k,m->to);
+				if(detect_castle_move(m, c) != NO_CASTLE){
+					perform_castle(detect_castle_move(m, c), c);
+					break;
+				}else{
+					RESET_BIT(player[c].k,m->from);
+					SET_BIT(player[c].k,m->to);
+				}
 				break;
 			case QUEEN:
 				RESET_BIT(player[c].q,m->from);
@@ -645,7 +650,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					/* every other piece uses king_is_checked(king_pos,c) */
 						restore_state();
 						free(temp);
-						printf("moving the king and the move results in us being checked \n");
+						/* printf("moving the king and the move results in us being checked \n"); */
 
 						continue;
 					} else {
@@ -700,7 +705,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						if(king_is_checked(king_pos, c) == TRUE) {
 							restore_state();
 							free(temp);
-							printf("king is being checked when moving pawn \n");
+							/* printf("king is being checked when moving pawn \n"); */
 							continue;
 						} else {
 							(*pcount)++;
@@ -725,7 +730,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						if(king_is_checked(king_pos, c) == TRUE) {
 							restore_state();
 							free(temp);
-							printf("king is being checked when promoting pawn \n");
+							/* printf("king is being checked when promoting pawn \n"); */
 							/* only need to check once since same move but diff
 							promotion choice. should exit if moving the pawn up results in
 							your own king being checked */
@@ -815,7 +820,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					/* every other piece uses king_is_checked(king_pos,c) */
 						restore_state();
 						free(temp);
-						printf("moving the rook and the move results in our king being checked \n");
+						/* printf("moving the rook and the move results in our king being checked \n"); */
 						continue;
 					} else {
 						(*pcount)++;
@@ -851,7 +856,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 						restore_state();
 						free(temp);
-						printf("moving the night and the move results in our king being checked \n");
+						/* printf("moving the night and the move results in our king being checked \n"); */
 						continue;
 					} else {
 						(*pcount)++;
@@ -884,7 +889,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					/* every other piece uses king_is_checked(king_pos,c) */
 						restore_state();
 						free(temp);
-						printf("moving the bishop and the move results in our king being checked \n");
+						/* printf("moving the bishop and the move results in our king being checked \n"); */
 						continue;
 					} else {
 						(*pcount)++;
@@ -917,7 +922,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					/* every other piece uses king_is_checked(king_pos,c) */
 						restore_state();
 						free(temp);
-						printf("moving the queen and the move results in our king being checked \n");
+						/* printf("moving the queen and the move results in our king being checked \n"); */
 						continue;
 					} else {
 						(*pcount)++;
@@ -962,10 +967,10 @@ Bool is_checkmate(PlayerColor c) {
 	Move *moves = NULL;
 	unsigned int moves_can_make = 0;
 	if(king_is_checked(kings_pos, 1-c)){
-		printf("!!! king is checked !!!\n");
+		/* printf("!!! king is checked !!!\n"); */
 
 		if((legal_moves(&moves, 1-c, &moves_can_make) == FALSE)){
-			printf("*** we have no legal moves ***\n");
+			/* printf("*** we have no legal moves ***\n"); */
 
 			return TRUE;
 		}

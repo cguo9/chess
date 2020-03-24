@@ -105,6 +105,7 @@ Bool run_mate2(Move *soln);
 
 /* Given a position, find a mate in 1. */
 Bool run_mate1(Move *soln);
+Bool xrun_mate1(Move *soln);
 
 /* temp global variables to save/load state with */
 extern Pos temp_ep_square;

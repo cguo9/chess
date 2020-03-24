@@ -21,9 +21,9 @@ Bool parse_board(char *board);
 Move parse_move();
 
 /* This function accepts a move from the user. The move is not validated */
-void prompt_move(Move *m, unsigned int move_number);
+/* void prompt_move(Move *m, unsigned int move_number); */
 
 /* This function prints a move on to the console */
-void print_move(Move *m);
+/* void print_move(Move *m); */
 
 #endif

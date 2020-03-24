@@ -39,6 +39,7 @@ int main(int argc, char const *argv[]) {
   */
   	int x;
   	char const *filename = argv[1];
+    char const *solutions = argv[2];
   	char *board_str = (char *)malloc(150);
   	memset(board_str, 0, 150);
   	FILE *fptr = fopen(filename, "r");
@@ -83,7 +84,7 @@ int main(int argc, char const *argv[]) {
 
         printf("================ Making moves and determining if checkmate ==============\n");
         /* temporarily, actually suppsoed to be argv[3]*/
-        mode = atoi(argv[2]);
+        mode = atoi(argv[3]);
         Bool found_sol = FALSE;
         if(mode == 1){
             Move *moves = NULL;
@@ -92,20 +93,34 @@ int main(int argc, char const *argv[]) {
             if(legal_moves(&moves, CurrentPlayer, &count)){
                 itr = moves;
                 while(itr != NULL){
-                    /* if(run_mate1(itr) == TRUE){ */
-
                     save_state2();
-                    make_move(itr, CurrentPlayer);
-                    printf("\nMaking Move... Piece %d, %d to %d", itr->piece, itr->from, itr->to);
-                    /*if(is_checkmate(1-CurrentPlayer) == TRUE){*/
-                    if(is_checkmate(CurrentPlayer) == TRUE){
+                    if(xrun_mate1(itr) == TRUE){
+                        /* put into solutions.txt here */
                         found_sol = TRUE;
-                        printf("CHECKMATE SOLUTION: Piece = %d  %d to %d\n", itr->piece, itr->from, itr->to);
-            /* put into solutions.txt later but print for now */
+                        printf("CHECKMATE SOLUTION: Piece = %d  %d to %d, Promotion = %d\n", itr->piece, itr->from, itr->to, itr->promotion_choice);
+                        printf("%c%c - %c%c\n",FILE_OF(itr->from), RANK_OF(itr->from), FILE_OF(itr->to), RANK_OF(itr->to));
+                        FILE *fptr2 = fopen(solutions, "a");
+                      	if(fptr2 == NULL){
+                      		printf("Error opening file\n");
+                      		return 0;
+                      	}
+                        fprintf(fptr2, "%c%c - %c%c\n",FILE_OF(itr->from), RANK_OF(itr->from), FILE_OF(itr->to), RANK_OF(itr->to) );
+                        fclose(fptr2);
                         break;
                     }
                     restore_state2();
                     itr = itr->next_move;
+                    /*save_state2();
+                    make_move(itr, CurrentPlayer);
+                    printf("\nMaking Move... Piece %d, %d to %d", itr->piece, itr->from, itr->to);
+                    if(is_checkmate(CurrentPlayer) == TRUE){
+                        found_sol = TRUE;
+                        printf("CHECKMATE SOLUTION: Piece = %d  %d to %d, Promotion = %d\n", itr->piece, itr->from, itr->to, itr->promotion_choice);
+
+                        break;
+                    }
+                    restore_state2();
+                    itr = itr->next_move;*/
                 }
             }
             if(found_sol == FALSE) printf("cannot find run_mate1 solution.\n");
@@ -141,6 +156,15 @@ int main(int argc, char const *argv[]) {
   	return 0;
 }
 
+Bool xrun_mate1(Move *soln){
+    make_move(soln, CurrentPlayer);
+    printf("\nMaking Move... Piece %d, %d to %d", soln->piece, soln->from, soln->to);
+    if(is_checkmate(CurrentPlayer) == TRUE){
+        return TRUE;
+    }
+    return FALSE;
+}
+
 Bool run_mate1(Move *soln){
     Move *moves = NULL;
     unsigned int count = 0;
@@ -156,8 +180,8 @@ Bool run_mate1(Move *soln){
             printf("\nMaking Move... Piece %d, %d to %d", itr->piece, itr->from, itr->to);
             /*if(is_checkmate(1-CurrentPlayer) == TRUE){*/
             if (is_checkmate(CurrentPlayer) == TRUE){
-                
-                printf("CHECKMATE SOLUTION: Piece = %d  %d to %d\n", itr->piece, itr->from, itr->to);
+                /* test if castling and promotion works for checkmate*/
+                printf("CHECKMATE SOLUTION: Piece = %d  %d to %d, Promotion\n", itr->piece, itr->from, itr->to, itr->promotion_choice);
                 /* put into solutions.txt later but print for now */
                 return TRUE;
             }
