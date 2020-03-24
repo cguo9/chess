@@ -142,10 +142,31 @@ int main(int argc, char const *argv[]) {
 }
 
 Bool run_mate1(Move *soln){
+    Move *moves = NULL;
+    unsigned int count = 0;
+    Move *itr;
+    if (legal_moves(&moves, CurrentPlayer, &count))
+    {
+        itr = moves;
+        while (itr != NULL)
+        {
+            /* if(run_mate1(itr) == TRUE){ */
+            save_state2();
+            make_move(itr, CurrentPlayer);
+            printf("\nMaking Move... Piece %d, %d to %d", itr->piece, itr->from, itr->to);
+            /*if(is_checkmate(1-CurrentPlayer) == TRUE){*/
+            if (is_checkmate(CurrentPlayer) == TRUE){
+                
+                printf("CHECKMATE SOLUTION: Piece = %d  %d to %d\n", itr->piece, itr->from, itr->to);
+                /* put into solutions.txt later but print for now */
+                return TRUE;
+            }
+            restore_state2();
+            itr = itr->next_move;
+        }
+    }
     return FALSE;
-
 }
-
 
 /* function to convert decimal to binary */
 /*
