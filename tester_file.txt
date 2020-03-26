@@ -1,9 +1,8 @@
 3R1B2/1b1p3r/nN6/1R6/r2kp3/P3pB2/nPQ5/K3N3 w - -
 3R1B2/1b1p3r/nN6/1R6/r2kQ3/P3pB2/nP6/K3N3 b - -
-queen moving but bishop can capture it
+
 
 8/2rR2n1/3b1q2/1pP5/1P1kNQ2/5BK1/N2nP3/3R1b2 w - -
-not finding any mates at all
+
 
 8/R7/4k3/5pP1/5P2/6NB/8/3RK3 w - -
-working for this mate

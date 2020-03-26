@@ -68,6 +68,34 @@ void restore_state_q(){
  */
 
 void make_move(Move *m, PlayerColor c){
+	Piece capture = get_piece_at(m->to, 1-c);
+	/*check if any opponent piece where we are trying to move to*/
+	if(capture){
+		switch(capture){
+			/*reset bit of opponent piece where we are trying to move to*/
+			case ROOK:
+				RESET_BIT(player[1-c].r,m->to);
+				break;
+			case KING:
+			/*dont think this case should ever be hit*/
+				RESET_BIT(player[1-c].k,m->to);
+				break;
+			case QUEEN:
+				RESET_BIT(player[1-c].q,m->to);
+				printf("\nafter capture, black queen is = %lu\n", player[BLACK].q);
+				break;
+			case BISHOP:
+				RESET_BIT(player[1-c].b,m->to);
+				break;
+			case NIGHT:
+				RESET_BIT(player[1-c].n,m->to);
+				break;
+			case PAWN:
+				RESET_BIT(player[1-c].p,m->to);
+				break;
+			case UNKNOWN: break;
+		}
+	}
 	switch(m->piece){
 			case ROOK:
 				RESET_BIT(player[c].r,m->from);
@@ -128,34 +156,7 @@ void make_move(Move *m, PlayerColor c){
 			case UNKNOWN: break;
 
 		}
-	Piece capture = get_piece_at(m->to, 1-c);
-	/*check if any opponent piece where we are trying to move to*/
-	if(capture){
-		switch(capture){
-			/*reset bit of opponent piece where we are trying to move to*/
-			case ROOK:
-				RESET_BIT(player[1-c].r,m->to);
-				break;
-			case KING:
-			/*dont think this case should ever be hit*/
-				RESET_BIT(player[1-c].k,m->to);
-				break;
-			case QUEEN:
-				RESET_BIT(player[1-c].q,m->to);
-				printf("\nafter capture, black queen is = %lu\n", player[BLACK].q);
-				break;
-			case BISHOP:
-				RESET_BIT(player[1-c].b,m->to);
-				break;
-			case NIGHT:
-				RESET_BIT(player[1-c].n,m->to);
-				break;
-			case PAWN:
-				RESET_BIT(player[1-c].p,m->to);
-				break;
-			case UNKNOWN: break;
-		}
-	}
+
 
 }
 
