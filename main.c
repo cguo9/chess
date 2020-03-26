@@ -18,6 +18,10 @@ PlayerColor temp_currentPlayer;
 PlayerState temp_player2[2];
 Pos temp_ep_square2;
 PlayerColor temp_currentPlayer2;
+
+PlayerState temp_player3[2];
+Pos temp_ep_square3;
+PlayerColor temp_currentPlayer3;
 /* used to test || delete later
 void decToBinary(int n);
 */
@@ -123,7 +127,7 @@ int main(int argc, char const *argv[]) {
                     itr = itr->next_move;*/
                 }
             }
-            if(found_sol == FALSE) printf("cannot find run_mate1 solution.\n");
+            if(found_sol == FALSE) printf("\ncannot find run_mate1 solution.\n");
 
         }else if(mode == 2){
             /*run_mate2();*/
@@ -157,9 +161,36 @@ int main(int argc, char const *argv[]) {
 }
 
 Bool xrun_mate1(Move *soln){
-    make_move(soln, CurrentPlayer);
+    /*Pos kings_pos;
+    int a;
+	for(a = 0; a < 64; a++){
+		if(IS_SET(player[1-CurrentPlayer].k, a) == 1){
+			kings_pos = a;
+			break;
+		}
+	}*/
     printf("\nMaking Move... Piece %d, %d to %d", soln->piece, soln->from, soln->to);
+    if(detect_castle_move(soln, CurrentPlayer)){
+        perform_castle(detect_castle_move(soln, CurrentPlayer), CurrentPlayer);
+        /*printf("\nRook board after performing castle %dside: %llu\n", detect_castle_move(soln, CurrentPlayer), player[CurrentPlayer].r);
+        printf("King Board: %llu \n",player[CurrentPlayer].k);*/
+    }else{
+        make_move(soln, CurrentPlayer);
+        /*if((soln->from == 36) && (soln->to == 21)){
+            printf("Queen board: %llu\n", get_queen_moves(37,CurrentPlayer));
+            if(king_is_checked(kings_pos, 1-CurrentPlayer)) printf("wow king is checked\n");
+            printf("black queen board = %lu\n", player[BLACK].q);
+            Move *moves = NULL;
+        	unsigned int moves_can_make = 0;
+            legal_moves(&moves, 1-CurrentPlayer, &moves_can_make);
+            printf("num moves: %d\n", moves_can_make);
+
+        }*/
+    }
+
+
     if(is_checkmate(CurrentPlayer) == TRUE){
+        printf("queen board __ %llu\n", player[WHITE].q);
         return TRUE;
     }
     return FALSE;

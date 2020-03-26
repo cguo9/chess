@@ -22,6 +22,17 @@ void save_state2(){
 	temp_currentPlayer2 = CurrentPlayer;
 }
 
+
+void save_state_q(){
+	/*memcpy(&temp_player, &player, sizeof(PlayerState));
+	memcpy(&temp_ep_square, &ep_square, sizeof(Pos));
+	memcpy(&temp_currentPlayer, &CurrentPlayer, sizeof(PlayerColor));*/
+	temp_ep_square3 = ep_square;
+	temp_player3[0] = player[0];
+	temp_player3[1] = player[1];
+	temp_currentPlayer3 = CurrentPlayer;
+}
+
 void restore_state(){
 	/*memcpy(&ep_square, &temp_ep_square, sizeof(Pos));
 	memcpy(&CurrentPlayer, &temp_currentPlayer, sizeof(PlayerColor));
@@ -42,6 +53,16 @@ void restore_state2(){
 	CurrentPlayer = temp_currentPlayer2;
 }
 
+void restore_state_q(){
+	/*memcpy(&ep_square, &temp_ep_square, sizeof(Pos));
+	memcpy(&CurrentPlayer, &temp_currentPlayer, sizeof(PlayerColor));
+	memcpy(&player, &temp_player, sizeof(PlayerState));*/
+	ep_square = temp_ep_square3;
+	player[0] = temp_player3[0];
+	player[1] = temp_player3[1];
+	CurrentPlayer = temp_currentPlayer3;
+}
+
 /* clear bit of opponent piece, set bit of your piece at that position, check if any opponent pieces
 	where you are moving to, and if there is clear bit on the opponent piece's board
  */
@@ -53,14 +74,19 @@ void make_move(Move *m, PlayerColor c){
 				SET_BIT(player[c].r,m->to);
 				break;
 			case KING:
-				if(detect_castle_move(m, c) != NO_CASTLE){
-					perform_castle(detect_castle_move(m, c), c);
+				/*if(detect_castle_move(m, c)){
+					printf("!!!!castling here !!!!!!! \n");
+					unsigned int castling = detect_castle_move(m, c);
+
+					perform_castle(castling, c);
 					break;
 				}else{
+				}*/
 					RESET_BIT(player[c].k,m->from);
 					SET_BIT(player[c].k,m->to);
-				}
-				break;
+					break;
+
+
 			case QUEEN:
 				RESET_BIT(player[c].q,m->from);
 				SET_BIT(player[c].q,m->to);
@@ -116,6 +142,7 @@ void make_move(Move *m, PlayerColor c){
 				break;
 			case QUEEN:
 				RESET_BIT(player[1-c].q,m->to);
+				printf("\nafter capture, black queen is = %lu\n", player[BLACK].q);
 				break;
 			case BISHOP:
 				RESET_BIT(player[1-c].b,m->to);
@@ -191,10 +218,10 @@ Board get_king_moves(Pos pos, PlayerColor c) {
 
 
 	if((player[c].castle_flags == CASTLE_KING)){
-		SET_BIT(king_board, BIT((pos+2)));
+		SET_BIT(king_board, pos+2);
 		/* player[c].castle_flags = NO_CASTLE; */
 	}else if ((player[c].castle_flags == CASTLE_QUEEN)){
-		SET_BIT(king_board, BIT((pos-3)));
+		SET_BIT(king_board, pos-2);
 		/* player[c].castle_flags = NO_CASTLE; */
 	}
 
@@ -268,6 +295,7 @@ Board get_rook_moves(Pos pos,PlayerColor c) {
 			}
 		}
 	}
+
 	RESET_BIT(rook_board, temp_pos);
 	return rook_board;
 
@@ -589,6 +617,7 @@ Bool king_is_checked(Pos pos, PlayerColor c){
 
 	/* printf("all-possible captures: %lu\n", all_possible_captures); */
 	/*got a board with 1s in places where you can get captured*/
+
 	if((IS_SET(all_possible_captures, pos)) == 1){
 
 		return TRUE;
@@ -619,6 +648,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 	int y;
 	int king_pos;
+	*pcount = 0;
 	/* position of king on the board, so we can check if moving a piece allows your
 	king to be under check by opponent. Dont change this value.
 	*/
@@ -655,6 +685,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						continue;
 					} else {
 						(*pcount)++; /*increment whats in pointer */
+						/* printf("pcount incr in k\n"); */
 						/* printf("bit of king after change: %llu\n", player[c].k); */
 						restore_state();
 						/* printf("bit of king after restore: %llu\n", player[c].k); */
@@ -676,7 +707,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 		} /*end of if (IS_SET(player[c].k, pos))*/
 
 
-		if (IS_SET(player[c].p, pos)) {
+		if (IS_SET(player[c].p, pos) == 1) {
 			Board pawn_moves = get_pawn_moves(pos,c);
 			/* printf("pos; %d		board: %llu\n", pos, pawn_moves); */
 			for(i = 0; i < 64; i++) {
@@ -709,6 +740,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 							continue;
 						} else {
 							(*pcount)++;
+							/* printf("pcount incr in p\n"); */
 							restore_state();
 							if ((*m) == NULL) {
 								(*m) = temp;
@@ -737,6 +769,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 							continue;
 						} else {
 							(*pcount)++;
+							/* printf("pcount incr in p1\n"); */
 							restore_state();
 							if ((*m) == NULL) {
 								(*m) = temp;
@@ -755,6 +788,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						temp2->promotion_choice = NIGHT;
 						make_move(temp2, c);
 						(*pcount)++;
+						/* printf("pcount incr in p2\n"); */
 						restore_state();
 						if ((*m) == NULL) {
 							(*m) = temp2;
@@ -772,6 +806,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						temp3->promotion_choice = BISHOP;
 						make_move(temp3, c);
 						(*pcount)++;
+						printf("pcount incr in p3\n");
 						restore_state();
 						if ((*m) == NULL) {
 							(*m) = temp3;
@@ -789,6 +824,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						temp4->promotion_choice = QUEEN;
 						make_move(temp4, c);
 						(*pcount)++;
+						/* printf("pcount incr in p4\n");*/
 						restore_state();
 						if ((*m) == NULL) {
 							(*m) = temp4;
@@ -805,7 +841,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 			}
 		} /*end of if (IS_SET(player[c].p, pos))*/
 
-		if (IS_SET(player[c].r, pos)) {
+		if (IS_SET(player[c].r, pos) == 1) {
 			Board rook_moves = get_rook_moves(pos,c);
 			for(i = 0; i < 64; i++) {
 				if(IS_SET(rook_moves, i) == 1) {
@@ -824,6 +860,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						continue;
 					} else {
 						(*pcount)++;
+						/* printf("pcount incr in r\n"); */
 						restore_state();
 						if ((*m) == NULL) {
 							(*m) = temp;
@@ -838,7 +875,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 		} /*end of if (IS_SET(player[c].r, pos))*/
 
 
-		if (IS_SET(player[c].n, pos)) {
+		if (IS_SET(player[c].n, pos) == 1) {
 			/* printf("night pos on board %d\n",pos); */
 			Board night_moves = get_night_moves(pos,c);
 			/* printf("night pos on board %llu\n",night_moves); */
@@ -860,6 +897,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						continue;
 					} else {
 						(*pcount)++;
+						/* printf("pcount incr in n\n"); */
 						restore_state();
 						if ((*m) == NULL) {
 							(*m) = temp;
@@ -874,7 +912,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 		} /*end of if (IS_SET(player[c].n, pos))*/
 
 
-		if (IS_SET(player[c].b, pos)) {
+		if (IS_SET(player[c].b, pos) == 1) {
+
 			Board bishop_moves = get_bishop_moves(pos,c);
 			for(i = 0; i < 64; i++) {
 				if(IS_SET(bishop_moves, i) == 1) {
@@ -893,6 +932,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						continue;
 					} else {
 						(*pcount)++;
+						/* printf("pcount incr in bishop\n"); */
+						printf("\nKing is not checked when bishop can move to %d\n", i);
 						restore_state();
 						if ((*m) == NULL) {
 							(*m) = temp;
@@ -907,11 +948,11 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 		} /*end of if (IS_SET(player[c].b, pos))*/
 
 
-		if (IS_SET(player[c].q, pos)) {
+		if (IS_SET(player[c].q, pos) == 1) {
 			Board queen_moves = get_queen_moves(pos,c);
 			for(i = 0; i < 64; i++) {
 				if(IS_SET(queen_moves, i) == 1) {
-					save_state();
+					save_state_q();
 					Move *temp = (Move *) malloc(sizeof(Move));
 					temp->from = pos;
 					temp->to = i;
@@ -920,13 +961,14 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					make_move(temp, c); /* need to restore since we're not actually moving here*/
 					if(king_is_checked(king_pos, c) == TRUE) {
 					/* every other piece uses king_is_checked(king_pos,c) */
-						restore_state();
+						restore_state_q();
 						free(temp);
 						/* printf("moving the queen and the move results in our king being checked \n"); */
 						continue;
 					} else {
 						(*pcount)++;
-						restore_state();
+						/* printf("pcount incr in queen\n"); */
+						restore_state_q();
 						if ((*m) == NULL) {
 							(*m) = temp;
 							head = temp;
@@ -941,7 +983,11 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 	}
 	*m = head;
-	if((*pcount) > 0) return TRUE;
+	printf("pcount is %d", (*pcount));
+	if((*pcount) > 0) {
+		printf("returning true\n");
+		return TRUE;
+	}
 	return FALSE;
 
 }
@@ -963,17 +1009,18 @@ Bool is_checkmate(PlayerColor c) {
 			break;
 		}
 	}
-	printf("opponent kings position: %d\n", kings_pos);
+	/* printf("   opponent kings position: %d\n", kings_pos); */
 	Move *moves = NULL;
 	unsigned int moves_can_make = 0;
 	if(king_is_checked(kings_pos, 1-c)){
 		/* printf("!!! king is checked !!!\n"); */
 
 		if((legal_moves(&moves, 1-c, &moves_can_make) == FALSE)){
-			/* printf("*** we have no legal moves ***\n"); */
+			 printf("*** we have no legal moves ***\n");
 
 			return TRUE;
 		}
+
 		restore_state();
 		/*
 		Move *moves = NULL;
@@ -1065,18 +1112,22 @@ unsigned int detect_castle_move(Move *move, PlayerColor c) {
 
 	if(c == BLACK){
 		if(move->piece == KING){
-			if(move->from == BKING_START_POS && move->to == 7){
+			if((move->from == BKING_START_POS) && (move->to == 6)){
+				/*printf("1 move->from = %d, move->to = %d\n", move->from, move->to);*/
 				return CASTLE_KING;
-			}else if(move->from == BKING_START_POS && move->to == 1){
+			}else if((move->from == BKING_START_POS) && (move->to == 2)){
+				/*printf("2 move->from = %d, move->to = %d\n", move->from, move->to);*/
 				return CASTLE_QUEEN;
 			}
 			return NO_CASTLE;
 		}
 	}else if (c == WHITE){
 		if(move->piece == KING){
-			if(move->from == WKING_START_POS && move->to == 62){
+			if((move->from == WKING_START_POS) && (move->to == 62)){
+				/*printf("3 move->from = %d, move->to = %d\n", move->from, move->to);*/
 				return CASTLE_KING;
-			}else if(move->from == WKING_START_POS && move->to == 57){
+			}else if((move->from == WKING_START_POS) && (move->to == 58)){
+				/*printf("4 move->from = %d, move->to = %d\n", move->from, move->to);*/
 				return CASTLE_QUEEN;
 			}
 			return NO_CASTLE;
@@ -1095,6 +1146,7 @@ void perform_castle(unsigned int castle, PlayerColor c) {
 			SET_BIT(player[c].k, BKING_START_POS+2);
 			RESET_BIT(player[c].r, 7);
 			SET_BIT(player[c].r, 5);
+
 		}else if (c == WHITE){
 			RESET_BIT(player[c].k, WKING_START_POS);
 			SET_BIT(player[c].k, WKING_START_POS+2);
@@ -1106,14 +1158,15 @@ void perform_castle(unsigned int castle, PlayerColor c) {
 	}else if(castle == CASTLE_QUEEN){
 		if(c == BLACK){
 			RESET_BIT(player[c].k, BKING_START_POS);
-			SET_BIT(player[c].k, BKING_START_POS-3);
+			SET_BIT(player[c].k, BKING_START_POS-2);
 			RESET_BIT(player[c].r, 0);
-			SET_BIT(player[c].r, 2);
+			SET_BIT(player[c].r, 3);
+
 		}else if (c == WHITE){
 			RESET_BIT(player[c].k, WKING_START_POS);
-			SET_BIT(player[c].k, WKING_START_POS-3);
+			SET_BIT(player[c].k, WKING_START_POS-2);
 			RESET_BIT(player[c].r, 56);
-			SET_BIT(player[c].r, 58);
+			SET_BIT(player[c].r, 59);
 		}
 
 		player[c].castle_flags = NO_CASTLE;

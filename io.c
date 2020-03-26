@@ -170,7 +170,7 @@ Bool parse_board(char *board) { /* DOES NOT PARSE THE MODE YET */
                  player[BLACK].castle_flags = CASTLE_KING;
                  continue;
              }else if(read_c == 'q'){
-                 player[BLACK].castle_flags = CASTLE_KING;
+                 player[BLACK].castle_flags = CASTLE_QUEEN;
                  continue;
              }
          }
