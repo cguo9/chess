@@ -45,6 +45,13 @@ void save_state6(){
 	temp_currentPlayer6 = CurrentPlayer;
 }
 
+void save_state7(){
+	temp_ep_square7 = ep_square;
+	temp_player7[0] = player[0];
+	temp_player7[1] = player[1];
+	temp_currentPlayer7 = CurrentPlayer;
+}
+
 void restore_state(){
 	ep_square = temp_ep_square;
 	player[0] = temp_player[0];
@@ -87,6 +94,13 @@ void restore_state6(){
 	CurrentPlayer = temp_currentPlayer6;
 }
 
+void restore_state7(){
+	ep_square = temp_ep_square7;
+	player[0] = temp_player7[0];
+	player[1] = temp_player7[1];
+	CurrentPlayer = temp_currentPlayer7;
+}
+
 /* clear bit of opponent piece, set bit of your piece at that position, check if any opponent pieces
 	where you are moving to, and if there is clear bit on the opponent piece's board
  */
@@ -106,7 +120,6 @@ void make_move(Move *m, PlayerColor c){
 				break;
 			case QUEEN:
 				RESET_BIT(player[1-c].q,m->to);
-				printf("\nafter capture, black queen is = %lu\n", player[BLACK].q);
 				break;
 			case BISHOP:
 				RESET_BIT(player[1-c].b,m->to);
@@ -776,7 +789,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 							}
 						}
 					}else{ /* is a promotional space */
-						printf("promotional space yay \n");
+
 						save_state();
 						Move *temp = (Move *) malloc(sizeof(Move));
 						temp->from = pos;
@@ -831,7 +844,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						temp3->promotion_choice = BISHOP;
 						make_move(temp3, c);
 						(*pcount)++;
-						printf("pcount incr in p3\n");
+
 						restore_state();
 						if ((*m) == NULL) {
 							(*m) = temp3;
@@ -958,7 +971,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					} else {
 						(*pcount)++;
 						/* printf("pcount incr in bishop\n"); */
-						printf("\nKing is not checked when bishop can move to %d\n", i);
+
 						restore_state();
 						if ((*m) == NULL) {
 							(*m) = temp;
@@ -1039,7 +1052,7 @@ Bool is_checkmate(PlayerColor c) {
 		/* printf("!!! king is checked !!!\n"); */
 
 		if((legal_moves(&moves, 1-c, &moves_can_make) == FALSE)){
-			 printf("*** we have no legal moves ***\n");
+			 /*printf("*** we have no legal moves ***\n");*/
 
 			return TRUE;
 		}

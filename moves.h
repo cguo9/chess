@@ -40,12 +40,14 @@ void save_state3();
 void save_state4();
 void save_state5();
 void save_state6();
+void save_state7();
 void restore_state(); /*restore all global variables*/
 void restore_state2();
 void restore_state3();
 void restore_state4();
 void restore_state5();
 void restore_state6();
+void restore_state7();
 
 void capture_piece(); /*clear bit of opponent piece, set bit of your piece at that position*/
 

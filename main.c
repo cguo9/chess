@@ -34,6 +34,10 @@ PlayerColor temp_currentPlayer5;
 PlayerState temp_player6[2];
 Pos temp_ep_square6;
 PlayerColor temp_currentPlayer6;
+
+PlayerState temp_player7[2];
+Pos temp_ep_square7;
+PlayerColor temp_currentPlayer7;
 /* used to test || delete later
 void decToBinary(int n);
 */
@@ -237,7 +241,7 @@ Move *soln is a move we can make with intial board.
 */
 
 /* 1. make the move for currentplayer. */
-
+    Bool flag_mate2 = FALSE;
     if(detect_castle_move(soln, CurrentPlayer)){
         perform_castle(detect_castle_move(soln, CurrentPlayer), CurrentPlayer);
     }else{
@@ -250,8 +254,11 @@ if there is a move, then there cannot be any mate in 2.
     Move *moves = NULL;
     unsigned int count = 0;
     Move *itr;
+
+/* legal moves for opponent after our first move was made */
     if(legal_moves(&moves, 1-CurrentPlayer, &count)){
         itr = moves;
+        /* for each legal move, make the move*/
         while(itr != NULL){
             save_state4();
             if(detect_castle_move(itr, 1-CurrentPlayer)){
@@ -259,22 +266,34 @@ if there is a move, then there cannot be any mate in 2.
             }else{
                 make_move(itr, 1-CurrentPlayer);
             }
-            /* find where our king is */
-            Pos kings_pos;
-            int r;
-            for(r = 0; r < 64; r++){
-        		if(IS_SET(player[CurrentPlayer].k, r) == 1){
-        			kings_pos = r;
-        			break;
-        		}
-        	}
-            if(king_is_checked(kings_pos, CurrentPlayer) == TRUE){
-                return FALSE;
-            }
+/* check all the legal moves we can make, if theres no mate in 1 move for us
+our first move was invalid. so there is no mate in 2 for the first move that we made
+An opponent move makes us unable to mate in 1... */
+            Move *moves5 = NULL;
+            unsigned int count5 = 0;
+            Move *itr5;
+            if(legal_moves(&moves5, CurrentPlayer, &count5)){
+                itr5 = moves5;
+                while(itr5 != NULL){
+                    save_state7();
+                    if(run_mate1(itr5) == TRUE){
+                        flag_mate2 = TRUE;
+                        break;
+                    }else{
+                        flag_mate2 = FALSE;
+                    }
+                    restore_state7();
+                    itr5 = itr5->next_move;
+                }
+            } /* opponent moved.
+            if there was no mate in 1 for us in our next turn then there is no mate in 2*/
+
             restore_state4();
             itr = itr->next_move;
         }
-
+    }
+    if(flag_mate2 == FALSE){
+        return FALSE;
     }
     restore_state3();
 
