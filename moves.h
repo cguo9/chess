@@ -38,10 +38,15 @@ void save_state(); /*save all global variables*/
 void save_state2();
 void save_state3();
 void save_state4();
+void save_state5();
+void save_state6();
 void restore_state(); /*restore all global variables*/
 void restore_state2();
 void restore_state3();
 void restore_state4();
+void restore_state5();
+void restore_state6();
+
 void capture_piece(); /*clear bit of opponent piece, set bit of your piece at that position*/
 
 Bool king_is_checked(Pos pos, PlayerColor c); /*returns TRUE if king is under check, FALSE otherwise*/

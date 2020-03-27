@@ -31,6 +31,20 @@ void save_state4(){
 	temp_currentPlayer4 = CurrentPlayer;
 }
 
+void save_state5(){
+	temp_ep_square5 = ep_square;
+	temp_player5[0] = player[0];
+	temp_player5[1] = player[1];
+	temp_currentPlayer5 = CurrentPlayer;
+}
+
+void save_state6(){
+	temp_ep_square6 = ep_square;
+	temp_player6[0] = player[0];
+	temp_player6[1] = player[1];
+	temp_currentPlayer6 = CurrentPlayer;
+}
+
 void restore_state(){
 	ep_square = temp_ep_square;
 	player[0] = temp_player[0];
@@ -57,6 +71,20 @@ void restore_state4(){
 	player[0] = temp_player4[0];
 	player[1] = temp_player4[1];
 	CurrentPlayer = temp_currentPlayer4;
+}
+
+void restore_state5(){
+	ep_square = temp_ep_square5;
+	player[0] = temp_player5[0];
+	player[1] = temp_player5[1];
+	CurrentPlayer = temp_currentPlayer5;
+}
+
+void restore_state6(){
+	ep_square = temp_ep_square6;
+	player[0] = temp_player6[0];
+	player[1] = temp_player6[1];
+	CurrentPlayer = temp_currentPlayer6;
 }
 
 /* clear bit of opponent piece, set bit of your piece at that position, check if any opponent pieces
@@ -1052,15 +1080,21 @@ Bool is_draw() {
 	int a;
 	Pos kings_pos;
 	for(a = 0; a < 64; a++){
-		if(IS_SET(player[1-CurrentPlayer].k, a) == 1){
+		if(IS_SET(player[CurrentPlayer].k, a) == 1){
 			kings_pos = a;
 			break;
 		}
 	}
 
-	if(king_is_checked(kings_pos, 1-CurrentPlayer) == FALSE){
+	if(king_is_checked(kings_pos, CurrentPlayer) == FALSE){
 		 /* if CurrentPlayer has no moves left */
-		return TRUE;
+		 Move *moves = NULL;
+	  	 unsigned int moves_can_make = 0;
+		 if((legal_moves(&moves, CurrentPlayer, &moves_can_make) == FALSE)){
+ 			 printf("*** we have no legal moves ***\n");
+
+ 			return TRUE;
+ 		}
 	}
 
 	return FALSE;

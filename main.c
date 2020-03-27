@@ -26,6 +26,14 @@ PlayerColor temp_currentPlayer3;
 PlayerState temp_player4[2];
 Pos temp_ep_square4;
 PlayerColor temp_currentPlayer4;
+
+PlayerState temp_player5[2];
+Pos temp_ep_square5;
+PlayerColor temp_currentPlayer5;
+
+PlayerState temp_player6[2];
+Pos temp_ep_square6;
+PlayerColor temp_currentPlayer6;
 /* used to test || delete later
 void decToBinary(int n);
 */
@@ -140,10 +148,18 @@ int main(int argc, char const *argv[]) {
             Move *itr;
             if(legal_moves(&moves, CurrentPlayer, &count)){
                 itr = moves;
+                printf("Legal moves for original board: \n");
                 while(itr != NULL){
                     save_state2();
                     if(run_mate2(itr) == TRUE){
                         found_sol = TRUE;
+                        FILE *fptr2 = fopen(solutions, "a");
+                      	if(fptr2 == NULL){
+                      		printf("Error opening file\n");
+                      		return 0;
+                      	}
+                        fprintf(fptr2, "First move: %c%c - %c%c\n",FILE_OF(itr->from), RANK_OF(itr->from), FILE_OF(itr->to), RANK_OF(itr->to) );
+                        fclose(fptr2);
                         break;
                     }
                     restore_state2();
@@ -227,57 +243,121 @@ Move *soln is a move we can make with intial board.
     }else{
         make_move(soln, CurrentPlayer);
     }
-
-/* 2. generate a new list of legal moves for opponent */
+/* after making move, check if opponent can make any moves that puts us under check
+if there is a move, then there cannot be any mate in 2.
+*/
+    save_state3();
     Move *moves = NULL;
     unsigned int count = 0;
     Move *itr;
     if(legal_moves(&moves, 1-CurrentPlayer, &count)){
         itr = moves;
         while(itr != NULL){
-            /* 3. save state 3, make move. */
-            save_state3();
+            save_state4();
             if(detect_castle_move(itr, 1-CurrentPlayer)){
                 perform_castle(detect_castle_move(itr, 1-CurrentPlayer), 1-CurrentPlayer);
             }else{
                 make_move(itr, 1-CurrentPlayer);
             }
-            /* 4. generate a new list of legal moves for currentplayer. */
+            /* find where our king is */
+            Pos kings_pos;
+            int r;
+            for(r = 0; r < 64; r++){
+        		if(IS_SET(player[CurrentPlayer].k, r) == 1){
+        			kings_pos = r;
+        			break;
+        		}
+        	}
+            if(king_is_checked(kings_pos, CurrentPlayer) == TRUE){
+                return FALSE;
+            }
+            restore_state4();
+            itr = itr->next_move;
+        }
+
+    }
+    restore_state3();
+
+    save_state5();
+    Move *moves3 = NULL;
+    unsigned int count3 = 0;
+    Move *itr3;
+    if(legal_moves(&moves3, CurrentPlayer, &count3)){
+        itr3 = moves3;
+        /* printf("================ Legal moves after OPPONENT MOVES ==============\n"); */
+        while(itr3 != NULL){
+            /* 5. save state 4, run mate in 1 function, if mate in 1, write solution and ret TRUE */
+            save_state6();
+            /* printf("PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n",(int)itr2->piece , itr2->from, itr2->to,
+                (int)itr2->promotion_choice); */
+            if(run_mate1(itr3) == TRUE){
+                FILE *fptr2 = fopen(solutions, "a");
+                if(fptr2 == NULL){
+                    printf("Error opening file\n");
+                    return 0;
+                }
+                fprintf(fptr2, "Second Move: %c%c - %c%c\n",FILE_OF(itr3->from), RANK_OF(itr3->from), FILE_OF(itr3->to), RANK_OF(itr3->to) );
+                fclose(fptr2);
+                return TRUE;
+            }
+            restore_state6();
+            itr3 = itr3->next_move;
+        }
+    }
+    restore_state5();
+    return FALSE;
+
+
+/* 2. generate a new list of legal moves for opponent */
+/*
+    Move *moves = NULL;
+    unsigned int count = 0;
+    Move *itr;
+    if(legal_moves(&moves, 1-CurrentPlayer, &count)){
+        itr = moves;
+
+        while(itr != NULL){
+
+            save_state3();
+
+            if(detect_castle_move(itr, 1-CurrentPlayer)){
+                perform_castle(detect_castle_move(itr, 1-CurrentPlayer), 1-CurrentPlayer);
+            }else{
+                make_move(itr, 1-CurrentPlayer);
+            }
+
             Move *moves2 = NULL;
             unsigned int count2 = 0;
             Move *itr2;
             if(legal_moves(&moves2, CurrentPlayer, &count2)){
                 itr2 = moves2;
-                while(itr2 != NULL){
-                    /* 5. save state 4, run mate in 1 function, if mate in 1, write solution and ret TRUE */
-                    save_state4();
-                    printf("================ Step 5 legal moves ==============\n");
-                    printf("PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n",(int)itr2->piece , itr2->from, itr2->to,
-        				(int)itr2->promotion_choice);
-                    if(run_mate1(itr2) == TRUE){
-                        /* put into solutions.txt here */
 
-                        printf("Mate in 2: Piece = %d  %d to %d, Promotion = %d\n", itr2->piece, itr2->from, itr2->to, itr2->promotion_choice);
-                        printf("%c%c - %c%c\n",FILE_OF(itr2->from), RANK_OF(itr2->from), FILE_OF(itr2->to), RANK_OF(itr2->to));
+                while(itr2 != NULL){
+
+                    save_state4();
+
+                    if(run_mate1(itr2) == TRUE){
+
                         FILE *fptr2 = fopen(solutions, "a");
                         if(fptr2 == NULL){
                             printf("Error opening file\n");
                             return 0;
                         }
-                        fprintf(fptr2, "%c%c - %c%c\n",FILE_OF(itr2->from), RANK_OF(itr2->from), FILE_OF(itr2->to), RANK_OF(itr2->to) );
+                        fprintf(fptr2, "Second Move: %c%c - %c%c\n",FILE_OF(itr2->from), RANK_OF(itr2->from), FILE_OF(itr2->to), RANK_OF(itr2->to) );
                         fclose(fptr2);
                         return TRUE;
                     }
-                    /*6. try the next legal move for us, looping step 5. */
+
                     restore_state4();
                     itr2 = itr2->next_move;
                 }
             }
-            /*7. if there was no mate in 1 found then restore state 6 and continue going thru legal moves of opponent? */
+
             restore_state3();
             itr = itr->next_move;
         }
     }
+*/
 /* no mate in 2 possibility for the first move we made. exit and continue checking
 the rest of the legal moves we can make from the parsed board.
 */
