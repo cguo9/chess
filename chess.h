@@ -105,7 +105,8 @@ Bool run_mate2(Move *soln);
 
 /* Given a position, find a mate in 1. */
 Bool run_mate1(Move *soln);
-Bool xrun_mate1(Move *soln);
+
+void freeing_list(Move *head);
 
 /* temp global variables to save/load state with */
 extern Pos temp_ep_square;
@@ -119,6 +120,10 @@ extern PlayerColor temp_currentPlayer2;
 extern Pos temp_ep_square3;
 extern PlayerState temp_player3[2];
 extern PlayerColor temp_currentPlayer3;
+
+extern Pos temp_ep_square4;
+extern PlayerState temp_player4[2];
+extern PlayerColor temp_currentPlayer4;
 
 
 #endif

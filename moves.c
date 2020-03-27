@@ -3,9 +3,6 @@
 
 
 void save_state(){
-	/*memcpy(&temp_player, &player, sizeof(PlayerState));
-	memcpy(&temp_ep_square, &ep_square, sizeof(Pos));
-	memcpy(&temp_currentPlayer, &CurrentPlayer, sizeof(PlayerColor));*/
 	temp_ep_square = ep_square;
 	temp_player[0] = player[0];
 	temp_player[1] = player[1];
@@ -13,9 +10,6 @@ void save_state(){
 }
 
 void save_state2(){
-	/*memcpy(&temp_player, &player, sizeof(PlayerState));
-	memcpy(&temp_ep_square, &ep_square, sizeof(Pos));
-	memcpy(&temp_currentPlayer, &CurrentPlayer, sizeof(PlayerColor));*/
 	temp_ep_square2 = ep_square;
 	temp_player2[0] = player[0];
 	temp_player2[1] = player[1];
@@ -23,20 +17,21 @@ void save_state2(){
 }
 
 
-void save_state_q(){
-	/*memcpy(&temp_player, &player, sizeof(PlayerState));
-	memcpy(&temp_ep_square, &ep_square, sizeof(Pos));
-	memcpy(&temp_currentPlayer, &CurrentPlayer, sizeof(PlayerColor));*/
+void save_state3(){
 	temp_ep_square3 = ep_square;
 	temp_player3[0] = player[0];
 	temp_player3[1] = player[1];
 	temp_currentPlayer3 = CurrentPlayer;
 }
 
+void save_state4(){
+	temp_ep_square4 = ep_square;
+	temp_player4[0] = player[0];
+	temp_player4[1] = player[1];
+	temp_currentPlayer4 = CurrentPlayer;
+}
+
 void restore_state(){
-	/*memcpy(&ep_square, &temp_ep_square, sizeof(Pos));
-	memcpy(&CurrentPlayer, &temp_currentPlayer, sizeof(PlayerColor));
-	memcpy(&player, &temp_player, sizeof(PlayerState));*/
 	ep_square = temp_ep_square;
 	player[0] = temp_player[0];
 	player[1] = temp_player[1];
@@ -44,23 +39,24 @@ void restore_state(){
 }
 
 void restore_state2(){
-	/*memcpy(&ep_square, &temp_ep_square, sizeof(Pos));
-	memcpy(&CurrentPlayer, &temp_currentPlayer, sizeof(PlayerColor));
-	memcpy(&player, &temp_player, sizeof(PlayerState));*/
 	ep_square = temp_ep_square2;
 	player[0] = temp_player2[0];
 	player[1] = temp_player2[1];
 	CurrentPlayer = temp_currentPlayer2;
 }
 
-void restore_state_q(){
-	/*memcpy(&ep_square, &temp_ep_square, sizeof(Pos));
-	memcpy(&CurrentPlayer, &temp_currentPlayer, sizeof(PlayerColor));
-	memcpy(&player, &temp_player, sizeof(PlayerState));*/
+void restore_state3(){
 	ep_square = temp_ep_square3;
 	player[0] = temp_player3[0];
 	player[1] = temp_player3[1];
 	CurrentPlayer = temp_currentPlayer3;
+}
+
+void restore_state4(){
+	ep_square = temp_ep_square4;
+	player[0] = temp_player4[0];
+	player[1] = temp_player4[1];
+	CurrentPlayer = temp_currentPlayer4;
 }
 
 /* clear bit of opponent piece, set bit of your piece at that position, check if any opponent pieces
@@ -953,7 +949,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 			Board queen_moves = get_queen_moves(pos,c);
 			for(i = 0; i < 64; i++) {
 				if(IS_SET(queen_moves, i) == 1) {
-					save_state_q();
+					save_state();
 					Move *temp = (Move *) malloc(sizeof(Move));
 					temp->from = pos;
 					temp->to = i;
@@ -962,14 +958,14 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					make_move(temp, c); /* need to restore since we're not actually moving here*/
 					if(king_is_checked(king_pos, c) == TRUE) {
 					/* every other piece uses king_is_checked(king_pos,c) */
-						restore_state_q();
+						restore_state();
 						free(temp);
 						/* printf("moving the queen and the move results in our king being checked \n"); */
 						continue;
 					} else {
 						(*pcount)++;
 						/* printf("pcount incr in queen\n"); */
-						restore_state_q();
+						restore_state();
 						if ((*m) == NULL) {
 							(*m) = temp;
 							head = temp;
@@ -984,9 +980,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 
 	}
 	*m = head;
-	printf("pcount is %d", (*pcount));
 	if((*pcount) > 0) {
-		printf("returning true\n");
 		return TRUE;
 	}
 	return FALSE;
@@ -1078,7 +1072,21 @@ Bool is_draw() {
 Piece get_piece_at(Board pos, PlayerColor c) {
     /* Your implementation */
 	if(c == WHITE){
-		switch(get_piece(pos)){
+		if (((IS_SET(player[WHITE].r,pos)) == 1)){
+            return ROOK;
+        }else if(((IS_SET(player[WHITE].n,pos)) == 1)){
+            return NIGHT;
+        }else if(((IS_SET(player[WHITE].b,pos)) == 1)){
+            return BISHOP;
+        }else if(((IS_SET(player[WHITE].q,pos)) == 1)){
+            return QUEEN;
+        }else if(((IS_SET(player[WHITE].k,pos)) == 1)){
+            return KING;
+        }else if(((IS_SET(player[WHITE].p,pos)) == 1)){
+            return PAWN;
+		}
+		return UNKNOWN;
+		/*switch(get_piece(pos)){
 			case 'R': return ROOK; break;
 			case 'N': return NIGHT; break;
 			case 'B': return BISHOP; break;
@@ -1086,10 +1094,24 @@ Piece get_piece_at(Board pos, PlayerColor c) {
 			case 'K': return KING; break;
 			case 'P': return PAWN; break;
 			default: return UNKNOWN;
-		}
+		}*/
 	}
 	else{
-		switch(get_piece(pos)){
+		if (((IS_SET(player[BLACK].r,pos)) == 1)){
+            return ROOK;
+        }else if(((IS_SET(player[BLACK].n,pos)) == 1)){
+            return NIGHT;
+        }else if(((IS_SET(player[BLACK].b,pos)) == 1)){
+            return BISHOP;
+        }else if(((IS_SET(player[BLACK].q,pos)) == 1)){
+            return QUEEN;
+        }else if(((IS_SET(player[BLACK].k,pos)) == 1)){
+            return KING;
+        }else if(((IS_SET(player[BLACK].p,pos)) == 1)){
+            return PAWN;
+		}
+		return UNKNOWN;
+		/*switch(get_piece(pos)){
 			case 'r': return ROOK; break;
 			case 'n': return NIGHT; break;
 			case 'b': return BISHOP; break;
@@ -1097,7 +1119,7 @@ Piece get_piece_at(Board pos, PlayerColor c) {
 			case 'k': return KING; break;
 			case 'p': return PAWN; break;
 			default: return UNKNOWN;
-		}
+		}*/
 	}
 }
 

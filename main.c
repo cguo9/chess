@@ -22,9 +22,15 @@ PlayerColor temp_currentPlayer2;
 PlayerState temp_player3[2];
 Pos temp_ep_square3;
 PlayerColor temp_currentPlayer3;
+
+PlayerState temp_player4[2];
+Pos temp_ep_square4;
+PlayerColor temp_currentPlayer4;
 /* used to test || delete later
 void decToBinary(int n);
 */
+
+char const *solutions;
 int main(int argc, char const *argv[]) {
   /* Your testing code here. */
   /*	outline:
@@ -43,7 +49,8 @@ int main(int argc, char const *argv[]) {
   */
   	int x;
   	char const *filename = argv[1];
-    char const *solutions = argv[2];
+    /* char const *solutions = argv[2]; */
+    solutions = argv[2];
   	char *board_str = (char *)malloc(150);
   	memset(board_str, 0, 150);
   	FILE *fptr = fopen(filename, "r");
@@ -67,11 +74,9 @@ int main(int argc, char const *argv[]) {
   			printf("Error parsing input.\n");
   			return 0;
   		}
-
-
+/*
         Move *moves = NULL;
         unsigned int count = 0;
-        /* Move *temp_head = moves; */
 	    Move *itr;
         printf("================ Legal Moves for Current Player ==============\n");
         if(legal_moves(&moves, CurrentPlayer, &count) == TRUE){
@@ -82,7 +87,7 @@ int main(int argc, char const *argv[]) {
                 itr = itr->next_move;
             }
             printf("Number of moves in linked list: %d\n", count);
-        }
+        }*/
 
 /* NEED TO FREE THIS LINKED LIST BEFORE PARSING NEXT BOARD */
 
@@ -98,7 +103,7 @@ int main(int argc, char const *argv[]) {
                 itr = moves;
                 while(itr != NULL){
                     save_state2();
-                    if(xrun_mate1(itr) == TRUE){
+                    if(run_mate1(itr) == TRUE){
                         /* put into solutions.txt here */
                         found_sol = TRUE;
                         printf("CHECKMATE SOLUTION: Piece = %d  %d to %d, Promotion = %d\n", itr->piece, itr->from, itr->to, itr->promotion_choice);
@@ -114,23 +119,47 @@ int main(int argc, char const *argv[]) {
                     }
                     restore_state2();
                     itr = itr->next_move;
-                    /*save_state2();
-                    make_move(itr, CurrentPlayer);
-                    printf("\nMaking Move... Piece %d, %d to %d", itr->piece, itr->from, itr->to);
-                    if(is_checkmate(CurrentPlayer) == TRUE){
+                }
+            }
+            if(found_sol == FALSE) {
+                printf("\ncannot find run_mate1 solution.\n");
+                FILE *fptr2 = fopen(solutions, "a");
+                if(fptr2 == NULL){
+                    printf("Error opening file\n");
+                    return 0;
+                }
+                fprintf(fptr2, "%d\n", 0);
+                fclose(fptr2);
+            }
+            /* while(moves != NULL){
+                freeing_list(moves);
+            } */
+        }else if(mode == 2){
+            Move *moves = NULL;
+            unsigned int count = 0;
+            Move *itr;
+            if(legal_moves(&moves, CurrentPlayer, &count)){
+                itr = moves;
+                while(itr != NULL){
+                    save_state2();
+                    if(run_mate2(itr) == TRUE){
                         found_sol = TRUE;
-                        printf("CHECKMATE SOLUTION: Piece = %d  %d to %d, Promotion = %d\n", itr->piece, itr->from, itr->to, itr->promotion_choice);
-
                         break;
                     }
                     restore_state2();
-                    itr = itr->next_move;*/
+                    itr = itr->next_move;
                 }
             }
-            if(found_sol == FALSE) printf("\ncannot find run_mate1 solution.\n");
-
-        }else if(mode == 2){
-            /*run_mate2();*/
+            if(found_sol == FALSE) {
+                printf("\ncannot find run_mate2 solution.\n");
+                FILE *fptr2 = fopen(solutions, "a");
+                if(fptr2 == NULL){
+                    printf("Error opening file\n");
+                    return 0;
+                }
+                fprintf(fptr2, "%d\n", 0);
+                fclose(fptr2);
+            }
         }else{
             printf("Invalid Mode (Must be 1 or 2).\n");
         }
@@ -160,81 +189,107 @@ int main(int argc, char const *argv[]) {
   	return 0;
 }
 
-Bool xrun_mate1(Move *soln){
-    /*Pos kings_pos;
-    int a;
-	for(a = 0; a < 64; a++){
-		if(IS_SET(player[1-CurrentPlayer].k, a) == 1){
-			kings_pos = a;
-			break;
-		}
-	}*/
-    printf("\nMaking Move... Piece %d, %d to %d", soln->piece, soln->from, soln->to);
+Bool run_mate1(Move *soln){
+    /* printf("\nMaking Move... Piece %d, %d to %d", soln->piece, soln->from, soln->to); */
     if(detect_castle_move(soln, CurrentPlayer)){
         perform_castle(detect_castle_move(soln, CurrentPlayer), CurrentPlayer);
-        /*printf("\nRook board after performing castle %dside: %llu\n", detect_castle_move(soln, CurrentPlayer), player[CurrentPlayer].r);
-        printf("King Board: %llu \n",player[CurrentPlayer].k);*/
     }else{
         make_move(soln, CurrentPlayer);
-        /*if((soln->from == 36) && (soln->to == 21)){
-            printf("Queen board: %llu\n", get_queen_moves(37,CurrentPlayer));
-            if(king_is_checked(kings_pos, 1-CurrentPlayer)) printf("wow king is checked\n");
-            printf("black queen board = %lu\n", player[BLACK].q);
-            Move *moves = NULL;
-        	unsigned int moves_can_make = 0;
-            legal_moves(&moves, 1-CurrentPlayer, &moves_can_make);
-            printf("num moves: %d\n", moves_can_make);
-
-        }*/
     }
 
-
     if(is_checkmate(CurrentPlayer) == TRUE){
-        printf("queen board __ %llu\n", player[WHITE].q);
         return TRUE;
     }
     return FALSE;
 }
 
-Bool run_mate1(Move *soln){
+Bool run_mate2(Move *soln){
+/* main saves state
+Move *soln is a move we can make with intial board.
+1. make the move for current player.
+2. generate a new list of legal moves for opponent
+3. save state 6, make move.
+4. generate a new list of legal moves for current player.
+5. save state 7, make move, if mate in 1, write solution and ret TRUE
+6. try the next legal move for us, looping step 5.
+7. if there was no mate in 1 found then restore state 6 and continue going thru legal moves of opponent?
+*** careful about saving states ***
+- every move made should have a save state and restore state
+- need to save state before run_mate1 and restore after cos it makes move.
+
+
+*/
+
+/* 1. make the move for currentplayer. */
+
+    if(detect_castle_move(soln, CurrentPlayer)){
+        perform_castle(detect_castle_move(soln, CurrentPlayer), CurrentPlayer);
+    }else{
+        make_move(soln, CurrentPlayer);
+    }
+
+/* 2. generate a new list of legal moves for opponent */
     Move *moves = NULL;
     unsigned int count = 0;
     Move *itr;
-    if (legal_moves(&moves, CurrentPlayer, &count))
-    {
+    if(legal_moves(&moves, 1-CurrentPlayer, &count)){
         itr = moves;
-        while (itr != NULL)
-        {
-            /* if(run_mate1(itr) == TRUE){ */
-            save_state2();
-            make_move(itr, CurrentPlayer);
-            printf("\nMaking Move... Piece %d, %d to %d", itr->piece, itr->from, itr->to);
-            /*if(is_checkmate(1-CurrentPlayer) == TRUE){*/
-            if (is_checkmate(CurrentPlayer) == TRUE){
-                /* test if castling and promotion works for checkmate*/
-                printf("CHECKMATE SOLUTION: Piece = %d  %d to %d, Promotion\n", itr->piece, itr->from, itr->to, itr->promotion_choice);
-                /* put into solutions.txt later but print for now */
-                return TRUE;
+        while(itr != NULL){
+            /* 3. save state 3, make move. */
+            save_state3();
+            if(detect_castle_move(itr, 1-CurrentPlayer)){
+                perform_castle(detect_castle_move(itr, 1-CurrentPlayer), 1-CurrentPlayer);
+            }else{
+                make_move(itr, 1-CurrentPlayer);
             }
-            restore_state2();
+            /* 4. generate a new list of legal moves for currentplayer. */
+            Move *moves2 = NULL;
+            unsigned int count2 = 0;
+            Move *itr2;
+            if(legal_moves(&moves2, CurrentPlayer, &count2)){
+                itr2 = moves2;
+                while(itr2 != NULL){
+                    /* 5. save state 4, run mate in 1 function, if mate in 1, write solution and ret TRUE */
+                    save_state4();
+                    printf("================ Step 5 legal moves ==============\n");
+                    printf("PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n",(int)itr2->piece , itr2->from, itr2->to,
+        				(int)itr2->promotion_choice);
+                    if(run_mate1(itr2) == TRUE){
+                        /* put into solutions.txt here */
+
+                        printf("Mate in 2: Piece = %d  %d to %d, Promotion = %d\n", itr2->piece, itr2->from, itr2->to, itr2->promotion_choice);
+                        printf("%c%c - %c%c\n",FILE_OF(itr2->from), RANK_OF(itr2->from), FILE_OF(itr2->to), RANK_OF(itr2->to));
+                        FILE *fptr2 = fopen(solutions, "a");
+                        if(fptr2 == NULL){
+                            printf("Error opening file\n");
+                            return 0;
+                        }
+                        fprintf(fptr2, "%c%c - %c%c\n",FILE_OF(itr2->from), RANK_OF(itr2->from), FILE_OF(itr2->to), RANK_OF(itr2->to) );
+                        fclose(fptr2);
+                        return TRUE;
+                    }
+                    /*6. try the next legal move for us, looping step 5. */
+                    restore_state4();
+                    itr2 = itr2->next_move;
+                }
+            }
+            /*7. if there was no mate in 1 found then restore state 6 and continue going thru legal moves of opponent? */
+            restore_state3();
             itr = itr->next_move;
         }
     }
+/* no mate in 2 possibility for the first move we made. exit and continue checking
+the rest of the legal moves we can make from the parsed board.
+*/
     return FALSE;
 }
 
-/* function to convert decimal to binary */
-/*
-void decToBinary(int n)
-{
-    int binaryNum[32];
-    int i = 0;
-    while (n > 0) {
-        binaryNum[i] = n % 2;
-        n = n / 2;
-        i++;
+void freeing_list(Move *head){
+    Move* temp;
+    while (head != NULL){
+       temp = head;
+       head = head->next_move;
+       free(temp);
     }
-    for (int j = i - 1; j >= 0; j--)
-         printf("%d", binaryNum[j]);
+
 }
-*/
