@@ -340,6 +340,8 @@ Board get_rook_moves(Pos pos,PlayerColor c) {
 }
 
 
+
+
 Board get_pawn_moves(Pos pos,PlayerColor c) {
 	Board pawn_board = BIT(pos);
 	/*if color is black, check if its still in starting pos, if it is you can move NORTH_OF or NORTH_OF(NORTH_OF())
@@ -1176,6 +1178,22 @@ PlayerColor get_color_at(Pos pos){
     if((get_piece(pos) == 'R') || (get_piece(pos) == 'N') || (get_piece(pos) == 'B') || (get_piece(pos) == 'Q')
     || (get_piece(pos) == 'K') || (get_piece(pos) == 'P')) return WHITE;
     else return BLACK;
+}
+
+void detect_and_set_ep(Move *move, PlayerColor c) {
+	if (c == BLACK) {
+		if (move->piece == PAWN) {
+			if ((move->from < 16) && (move->from > 7) && (move->to > 23) && (move->to <32)) {
+				ep_square = (move->from + 8);
+			}
+		}
+	} else if (c == WHITE) {
+		if (move->piece == PAWN) {
+			if((move->from > 47) && (move->from < 56) && (move->to > 31) && (move->to < 40)) {
+				ep_square = (move->from - 8);
+			}
+		}
+	}
 }
 
 /* Check if this move is trying to castle */

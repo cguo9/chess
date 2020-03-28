@@ -34,6 +34,8 @@ unsigned int detect_castle_move(Move *move, PlayerColor c);
 /* Perform castling. Moves king and rook and resets castle flags */
 void perform_castle(unsigned int castle, PlayerColor c);
 
+void detect_and_set_ep(Move *move, PlayerColor c);
+
 void save_state(); /*save all global variables*/
 void save_state2();
 void save_state3();

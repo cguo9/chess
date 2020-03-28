@@ -126,7 +126,7 @@ int main(int argc, char const *argv[]) {
                       		printf("Error opening file\n");
                       		return 0;
                       	}
-                        fprintf(fptr2, "%c%c - %c%c\n",FILE_OF(itr->from), RANK_OF(itr->from), FILE_OF(itr->to), RANK_OF(itr->to) );
+                        fprintf(fptr2, "%c%c-%c%c\n",FILE_OF(itr->from), RANK_OF(itr->from), FILE_OF(itr->to), RANK_OF(itr->to) );
                         fclose(fptr2);
                         break;
                     }
@@ -157,7 +157,7 @@ int main(int argc, char const *argv[]) {
                 printf("Legal moves for original board: \n");
                 while(itr != NULL){
                     save_state2();
-                    if(run_mate2(itr) == TRUE){
+                    if(matein2(itr) == TRUE){
                         printf("Found Checkmate\n");
                         found_sol = TRUE;
                         FILE *fptr2 = fopen(solutions, "a");
@@ -165,7 +165,7 @@ int main(int argc, char const *argv[]) {
                       		printf("Error opening file\n");
                       		return 0;
                       	}
-                        fprintf(fptr2, "First move: %c%c - %c%c\n",FILE_OF(itr->from), RANK_OF(itr->from), FILE_OF(itr->to), RANK_OF(itr->to) );
+                        fprintf(fptr2, "%c%c-%c%c\n",FILE_OF(itr->from), RANK_OF(itr->from), FILE_OF(itr->to), RANK_OF(itr->to) );
                         fclose(fptr2);
                         break;
                     }
@@ -227,6 +227,36 @@ Bool run_mate1(Move *soln){
     return FALSE;
 }
 
+Bool existmate1(PlayerColor c) {
+    Move *moves = NULL;
+    unsigned int count;
+    Move *itr = NULL;
+    Bool mate_in_1_flag = FALSE;
+
+
+    if(legal_moves(&moves, c, &count)) {
+        itr = moves;
+        while (itr != NULL) {
+            save_state4();
+            if (detect_castle_move(itr, c)) {
+                perform_castle(detect_castle_move(itr, c), c);
+            } else {
+                make_move(itr, c);
+            }
+            if(run_mate1(itr)) {
+                mate_in_1_flag = TRUE;
+                return TRUE;
+            }
+            itr = itr->next_move;
+            restore_state4();
+        }
+    } else {
+        return FALSE;
+    }
+    return mate_in_1_flag;
+}
+
+
 Bool run_mate2(Move *soln){
 /* main saves state
 Move *soln is a move we can make with intial board.
@@ -281,8 +311,7 @@ An opponent move makes us unable to mate in 1... */
                 while(itr5 != NULL){
                     save_state7();
                     if(run_mate1(itr5) == FALSE){
-                        flag_mate2 = FALSE;
-                        break;
+                        return FALSE;
                     }else{
                         flag_mate2 = TRUE;
                     }
@@ -291,7 +320,7 @@ An opponent move makes us unable to mate in 1... */
                 }
             } /* opponent moved.
             if there was no mate in 1 for us in our next turn then there is no mate in 2*/
-            /*freeing_list(moves5); error here*/ 
+            /*freeing_list(moves5); error here*/
 
             restore_state4();
             itr = itr->next_move;
@@ -392,57 +421,51 @@ the rest of the legal moves we can make from the parsed board.
 }
 
 
-/* Bool matein2(Move *soln) {
+Bool matein2(Move *soln) {
     Bool mate2_flag = TRUE;
     if(detect_castle_move(soln, CurrentPlayer)) {
         perform_castle(detect_castle_move(soln, CurrentPlayer), CurrentPlayer);
     } else {
+        /*printf("OUR MOVE PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n", (int)soln->piece, soln->from, soln->to,
+               (int)soln->promotion_choice); */
         make_move(soln, CurrentPlayer);
     }
 
-    save_state3();
-    
-    while(mate2_flag == TRUE) {
-        Move *moves = NULL;
-        unsigned int count = 0;
-        Move *itr;
-        if(legal_moves(&moves, 1-CurrentPlayer, &count)) {
-            itr = moves;
-            while(itr != NULL) {
-                save_state4();
-                if(detect_castle_move(itr, 1-CurrentPlayer), 1-CurrentPlayer) {
-                    perform_castle(detect_castle_move(itr, 1 - CurrentPlayer), 1 - CurrentPlayer);
-                } else {
-                    make_move(itr, 1-CurrentPlayer);
+    /*check for enpassant here */
+    detect_and_set_ep(soln, CurrentPlayer);
 
-                }
 
-                Move *moves2 = NULL;
-                unsigned int count2 = 0;
-                Move *itr2;
-                if(legal_moves(&moves2, CurrentPlayer, &count2)) {   
-                    itr2 = moves2;
-                    while(itr2 != NULL) {
-                        display_board();
-                        save_state5();
-                        if(run_mate1(itr2) == FALSE) {
-                            return FALSE;
-                        }
-                        restore_state5();
-                        itr2 = itr2->next_move;
-                    }
-                }
-            
-            restore_state4();
-            itr = itr->next_move;
+    Move *moves = NULL;
+    unsigned int count = 0;
+    Move *itr;
+    if(legal_moves(&moves, 1-CurrentPlayer, &count)) {
+        itr = moves;
+        while(itr != NULL) {
+            save_state7();
+            /*rintf("OPPONENT MOVE PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n", (int)itr->piece, itr->from, itr->to,
+                   (int)itr->promotion_choice); */
+            if(detect_castle_move(itr, 1-CurrentPlayer), 1-CurrentPlayer) {
+                perform_castle(detect_castle_move(itr, 1 - CurrentPlayer), 1 - CurrentPlayer);
+            } else {
+                make_move(itr, 1-CurrentPlayer);
             }
+            detect_and_set_ep(itr, 1-CurrentPlayer);
+            
+            if(existmate1(CurrentPlayer) == FALSE) {
+                /*display_board();
+                printf("No mate in 1\n"); */
+                mate2_flag = FALSE;
+                return FALSE;
+            }
+            restore_state7();
+            itr = itr->next_move;
         }
-    
+    } else {
+        return FALSE;
     }
-    printf("TRUE\n");
-    return TRUE;
+    return mate2_flag;
 }
-*/
+
 
 void freeing_list(Move *head){
     Move* temp;
