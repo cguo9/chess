@@ -112,7 +112,7 @@ int main(int argc, char const *argv[]) {
             Move *moves = NULL;
             unsigned int count = 0;
             Move *itr;
-	    Move *temp;
+	    /*Move *temp;*/
             if(legal_moves(&moves, CurrentPlayer, &count)){
                 itr = moves;
                 while(itr != NULL){
@@ -132,13 +132,13 @@ int main(int argc, char const *argv[]) {
                         break;
                     }
                     restore_state2();
-		    temp = itr;
+		    /*temp = itr;*/
                     itr = itr->next_move;
-		    free(temp);
+		    /*free(temp);*/
                 }
-		free(itr);
+		/*free(itr);*/
             }
-           /* freeing_list(moves);*/
+            freeing_list(&moves);
             if(found_sol == FALSE) {
                 printf("\ncannot find run_mate1 solution.\n");
                 FILE *fptr2 = fopen(solutions, "a");
@@ -252,13 +252,14 @@ Bool existmate1(PlayerColor c) {
             }
             if(run_mate1(itr)) {
                 mate_in_1_flag = TRUE;
-		/*freeing_list(&moves); */
+		/*freeing_list(&moves);*/ 
                 return TRUE;
             }
 	  
             itr = itr->next_move; 
             restore_state4();
         }
+	/*freeing_list(&moves);*/
     } else {
         return FALSE;
     }
@@ -284,7 +285,7 @@ Bool run_mate2(Move *soln) {
     Move *moves = NULL;
     unsigned int count = 0;
     Move *itr;
-    Move *temp;
+    /*Move *temp;*/
     if(legal_moves(&moves, 1-CurrentPlayer, &count)) {
         itr = moves;
         while(itr != NULL) {
@@ -304,12 +305,13 @@ Bool run_mate2(Move *soln) {
                 mate2_flag = FALSE;
                 return FALSE;
             }
-            restore_state7();
-	    temp = itr;
+           /* restore_state7();
+	    temp = itr;*/
             itr = itr->next_move;
-	    free(temp);
+	    /*free(temp);*/
         }
-	free(itr);
+	freeing_list(&moves);
+	/*free(itr);*/
     } else {
         return FALSE;
     }
