@@ -255,10 +255,10 @@ Board get_king_moves(Pos pos, PlayerColor c) {
 	}
 
 
-	if((player[c].castle_flags == CASTLE_KING)){
+	if(player[c].castle_flags == CASTLE_KING){
 		SET_BIT(king_board, pos+2);
 		/* player[c].castle_flags = NO_CASTLE; */
-	}else if ((player[c].castle_flags == CASTLE_QUEEN)){
+	}else if (player[c].castle_flags == CASTLE_QUEEN){
 		SET_BIT(king_board, pos-2);
 		/* player[c].castle_flags = NO_CASTLE; */
 	}
@@ -1038,7 +1038,7 @@ Bool is_checkmate(PlayerColor c) {
     */
 
 	int a;
-	Pos kings_pos;
+	Pos kings_pos = 0;
 	for(a = 0; a < 64; a++){
 		if(IS_SET(player[1-c].k, a) == 1){
 			kings_pos = a;
@@ -1091,7 +1091,7 @@ Bool is_draw() {
 		maybe pass in our moves LL and check if its null inside the if opponent king is not checked
 	*/
 	int a;
-	Pos kings_pos;
+	Pos kings_pos = 0;
 	for(a = 0; a < 64; a++){
 		if(IS_SET(player[CurrentPlayer].k, a) == 1){
 			kings_pos = a;

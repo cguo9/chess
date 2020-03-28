@@ -86,7 +86,7 @@ int main(int argc, char const *argv[]) {
   			printf("Error parsing input.\n");
   			return 0;
   		}
-/*
+
         Move *moves = NULL;
         unsigned int count = 0;
 	    Move *itr;
@@ -99,7 +99,7 @@ int main(int argc, char const *argv[]) {
                 itr = itr->next_move;
             }
             printf("Number of moves in linked list: %d\n", count);
-        }*/
+        }
 
 /* NEED TO FREE THIS LINKED LIST BEFORE PARSING NEXT BOARD */
 
@@ -223,6 +223,10 @@ Bool run_mate1(Move *soln){
     return FALSE;
 }
 
+/*Bool mate1_exists() {
+    
+}*/
+
 Bool run_mate2(Move *soln){
 /* main saves state
 Move *soln is a move we can make with intial board.
@@ -230,7 +234,7 @@ Move *soln is a move we can make with intial board.
 2. generate a new list of legal moves for opponent
 3. save state 6, make move.
 4. generate a new list of legal moves for current player.
-5. save state 7, make move, if mate in 1, write solution and ret TRUE
+5. save state 7, make move, if there exists not mate in 1, ret FALSE, else write solution and ret TRUE
 6. try the next legal move for us, looping step 5.
 7. if there was no mate in 1 found then restore state 6 and continue going thru legal moves of opponent?
 *** careful about saving states ***
@@ -241,10 +245,12 @@ Move *soln is a move we can make with intial board.
 */
 
 /* 1. make the move for currentplayer. */
-    Bool flag_mate2 = FALSE;
+    Bool flag_mate2 = TRUE;
     if(detect_castle_move(soln, CurrentPlayer)){
         perform_castle(detect_castle_move(soln, CurrentPlayer), CurrentPlayer);
     }else{
+        printf("---------OUR MOVES--------\n");
+        printf("PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n", (int)soln->piece, soln->from, soln->to, (int)soln->promotion_choice);
         make_move(soln, CurrentPlayer);
     }
 /* after making move, check if opponent can make any moves that puts us under check
@@ -259,11 +265,13 @@ if there is a move, then there cannot be any mate in 2.
     if(legal_moves(&moves, 1-CurrentPlayer, &count)){
         itr = moves;
         /* for each legal move, make the move*/
+        printf("----------OPP MOVES---------\n");
         while(itr != NULL){
             save_state4();
             if(detect_castle_move(itr, 1-CurrentPlayer)){
                 perform_castle(detect_castle_move(itr, 1-CurrentPlayer), 1-CurrentPlayer);
             }else{
+                printf("PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n", (int)itr->piece, itr->from, itr->to, (int)itr->promotion_choice);
                 make_move(itr, 1-CurrentPlayer);
             }
 /* check all the legal moves we can make, if theres no mate in 1 move for us
@@ -274,13 +282,16 @@ An opponent move makes us unable to mate in 1... */
             Move *itr5;
             if(legal_moves(&moves5, CurrentPlayer, &count5)){
                 itr5 = moves5;
+                printf("----------OUR MOVES 2---------\n");
                 while(itr5 != NULL){
+                    printf("PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n", (int)itr5->piece, itr5->from, itr5->to, (int)itr5->promotion_choice);
                     save_state7();
-                    if(run_mate1(itr5) == TRUE){
-                        flag_mate2 = TRUE;
+                    if(run_mate1(itr5) == FALSE){
+                        printf("Mate in 1 is false\n");
+                        flag_mate2 = FALSE;
                         break;
                     }else{
-                        flag_mate2 = FALSE;
+                        flag_mate2 = TRUE;
                     }
                     restore_state7();
                     itr5 = itr5->next_move;
