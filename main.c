@@ -112,9 +112,11 @@ int main(int argc, char const *argv[]) {
             Move *moves = NULL;
             unsigned int count = 0;
             Move *itr;
+	    Move *head;
 	    /*Move *temp;*/
             if(legal_moves(&moves, CurrentPlayer, &count)){
                 itr = moves;
+		head = moves;
                 while(itr != NULL){
                     save_state2();
                     if(run_mate1(itr) == TRUE){
@@ -138,7 +140,7 @@ int main(int argc, char const *argv[]) {
                 }
 		/*free(itr);*/
             }
-            freeing_list(&moves);
+            freeing_list(&head);
             if(found_sol == FALSE) {
                 printf("\ncannot find run_mate1 solution.\n");
                 FILE *fptr2 = fopen(solutions, "a");
@@ -156,9 +158,10 @@ int main(int argc, char const *argv[]) {
             Move *moves = NULL;
             unsigned int count = 0;
             Move *itr;
-	    Move *temp;
+	    Move *head;
             if(legal_moves(&moves, CurrentPlayer, &count)){
                 itr = moves;
+		head = moves;
                 printf("Legal moves for original board: \n");
                 while(itr != NULL){
                     save_state2();
@@ -175,13 +178,13 @@ int main(int argc, char const *argv[]) {
                         break;
                     }
                     restore_state2();
-		    temp = itr;
+		    /*temp = itr;*/
                     itr = itr->next_move;
-		    free(temp);
+		    /*free(temp);*/
                 }      
-	       free(itr);	
+	       /*free(itr);*/	
             }
-           /* freeing_list(moves); */
+            freeing_list(&head); 
             if(found_sol == FALSE) {
                 printf("\ncannot find run_mate2 solution.\n");
                 FILE *fptr2 = fopen(solutions, "a");
@@ -285,9 +288,11 @@ Bool run_mate2(Move *soln) {
     Move *moves = NULL;
     unsigned int count = 0;
     Move *itr;
+    Move *head;
     /*Move *temp;*/
     if(legal_moves(&moves, 1-CurrentPlayer, &count)) {
         itr = moves;
+	head = moves;
         while(itr != NULL) {
             save_state7();
             /*rintf("OPPONENT MOVE PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n", (int)itr->piece, itr->from, itr->to,
@@ -310,7 +315,7 @@ Bool run_mate2(Move *soln) {
             itr = itr->next_move;
 	    /*free(temp);*/
         }
-	freeing_list(&moves);
+	freeing_list(&head);
 	/*free(itr);*/
     } else {
         return FALSE;
