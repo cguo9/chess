@@ -103,6 +103,8 @@ extern Mode mode;
 /* Given a position, find a mate in 2. */
 Bool run_mate2(Move *soln);
 
+Bool matein2(Move *soln);
+
 /* Given a position, find a mate in 1. */
 Bool run_mate1(Move *soln);
 
