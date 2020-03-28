@@ -87,7 +87,7 @@ int main(int argc, char const *argv[]) {
   			return 0;
   		}
 
-        Move *moves = NULL;
+       /* Move *moves = NULL;
         unsigned int count = 0;
 	    Move *itr;
         printf("================ Legal Moves for Current Player ==============\n");
@@ -99,7 +99,7 @@ int main(int argc, char const *argv[]) {
                 itr = itr->next_move;
             }
             printf("Number of moves in linked list: %d\n", count);
-        }
+        } */
         /*freeing_list(moves); error here */
 
 /* NEED TO FREE THIS LINKED LIST BEFORE PARSING NEXT BOARD */
@@ -134,7 +134,7 @@ int main(int argc, char const *argv[]) {
                     itr = itr->next_move;
                 }
             }
-            /*freeing_list(moves);*/
+           /* freeing_list(moves);*/
             if(found_sol == FALSE) {
                 printf("\ncannot find run_mate1 solution.\n");
                 FILE *fptr2 = fopen(solutions, "a");
@@ -173,7 +173,7 @@ int main(int argc, char const *argv[]) {
                     itr = itr->next_move;
                 }       
             }
-            /*freeing_list(moves);*/
+           /* freeing_list(moves); */
             if(found_sol == FALSE) {
                 printf("\ncannot find run_mate2 solution.\n");
                 FILE *fptr2 = fopen(solutions, "a");
@@ -190,7 +190,6 @@ int main(int argc, char const *argv[]) {
 
   		/* store solution in result.txt*/
   		memset(board_str, 0, 150); /* reset everything for next puzzle */
-
 		int z;
   		for(z = 0; z < 2; z++){
   			player[z].r &= 0;
