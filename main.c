@@ -87,7 +87,7 @@ int main(int argc, char const *argv[]) {
   			return 0;
   		}
 
-       /* Move *moves = NULL;
+        /*Move *moves = NULL;
         unsigned int count = 0;
 	    Move *itr;
         printf("================ Legal Moves for Current Player ==============\n");
