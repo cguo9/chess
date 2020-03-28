@@ -1058,6 +1058,13 @@ Bool is_checkmate(PlayerColor c) {
 
 			return TRUE;
 		}
+		/*while(moves != NULL) { 
+			temp = moves;
+			moves = moves->next_move;
+			free(temp);
+		} */
+		
+		
 		/*freeing_list(moves); */
 
 		restore_state();
@@ -1105,12 +1112,19 @@ Bool is_draw() {
 	if(king_is_checked(kings_pos, CurrentPlayer) == FALSE){
 		 /* if CurrentPlayer has no moves left */
 		 Move *moves = NULL;
+		 Move *temp;
 	  	 unsigned int moves_can_make = 0;
 		 if((legal_moves(&moves, CurrentPlayer, &moves_can_make) == FALSE)){
  			 printf("*** we have no legal moves ***\n");
 
  			return TRUE;
  		}
+		 while(moves != NULL) {
+			 temp = moves;
+			 moves = moves->next_move;
+			 free(temp);
+		}
+		free(moves);
 		/*freeing_list(moves); */
 	}
 

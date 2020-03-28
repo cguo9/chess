@@ -112,6 +112,7 @@ int main(int argc, char const *argv[]) {
             Move *moves = NULL;
             unsigned int count = 0;
             Move *itr;
+	    Move *temp;
             if(legal_moves(&moves, CurrentPlayer, &count)){
                 itr = moves;
                 while(itr != NULL){
@@ -131,8 +132,11 @@ int main(int argc, char const *argv[]) {
                         break;
                     }
                     restore_state2();
+		    temp = itr;
                     itr = itr->next_move;
+		    free(temp);
                 }
+		free(itr);
             }
            /* freeing_list(moves);*/
             if(found_sol == FALSE) {
@@ -152,6 +156,7 @@ int main(int argc, char const *argv[]) {
             Move *moves = NULL;
             unsigned int count = 0;
             Move *itr;
+	    Move *temp;
             if(legal_moves(&moves, CurrentPlayer, &count)){
                 itr = moves;
                 printf("Legal moves for original board: \n");
@@ -170,8 +175,11 @@ int main(int argc, char const *argv[]) {
                         break;
                     }
                     restore_state2();
+		    temp = itr;
                     itr = itr->next_move;
-                }       
+		    free(temp);
+                }      
+	       free(itr);	
             }
            /* freeing_list(moves); */
             if(found_sol == FALSE) {
@@ -231,6 +239,7 @@ Bool existmate1(PlayerColor c) {
     unsigned int count;
     Move *itr = NULL;
     Bool mate_in_1_flag = FALSE;
+    
 
 
     if(legal_moves(&moves, c, &count)) {
@@ -246,7 +255,9 @@ Bool existmate1(PlayerColor c) {
                 mate_in_1_flag = TRUE;
                 return TRUE;
             }
+	   /* temp = itr; */
             itr = itr->next_move;
+	   /* free(temp); */
             restore_state4();
         }
     } else {
@@ -273,6 +284,7 @@ Bool run_mate2(Move *soln) {
     Move *moves = NULL;
     unsigned int count = 0;
     Move *itr;
+    Move *temp;
     if(legal_moves(&moves, 1-CurrentPlayer, &count)) {
         itr = moves;
         while(itr != NULL) {
@@ -283,7 +295,7 @@ Bool run_mate2(Move *soln) {
                 perform_castle(detect_castle_move(itr, 1 - CurrentPlayer), 1 - CurrentPlayer);
             } else {
                 make_move(itr, 1-CurrentPlayer);
-            }
+      	     }
             detect_and_set_ep(itr, 1-CurrentPlayer);
 
             if(existmate1(CurrentPlayer) == FALSE) {
@@ -293,8 +305,11 @@ Bool run_mate2(Move *soln) {
                 return FALSE;
             }
             restore_state7();
+	    temp = itr;
             itr = itr->next_move;
+	    free(temp);
         }
+	free(itr);
     } else {
         return FALSE;
     }
