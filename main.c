@@ -134,7 +134,7 @@ int main(int argc, char const *argv[]) {
                     itr = itr->next_move;
                 }
             }
-            freeing_list(moves);
+            /*freeing_list(moves);*/
             if(found_sol == FALSE) {
                 printf("\ncannot find run_mate1 solution.\n");
                 FILE *fptr2 = fopen(solutions, "a");
@@ -156,7 +156,6 @@ int main(int argc, char const *argv[]) {
                 itr = moves;
                 printf("Legal moves for original board: \n");
                 while(itr != NULL){
-                    printf("PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n", (int)itr->piece, itr->from, itr->to, (int)itr->promotion_choice);
                     save_state2();
                     if(run_mate2(itr) == TRUE){
                         printf("Found Checkmate\n");
@@ -174,7 +173,7 @@ int main(int argc, char const *argv[]) {
                     itr = itr->next_move;
                 }       
             }
-            freeing_list(moves);
+            /*freeing_list(moves);*/
             if(found_sol == FALSE) {
                 printf("\ncannot find run_mate2 solution.\n");
                 FILE *fptr2 = fopen(solutions, "a");
@@ -281,10 +280,8 @@ An opponent move makes us unable to mate in 1... */
                 itr5 = moves5;
                 while(itr5 != NULL){
                     save_state7();
-                    display_board();
                     if(run_mate1(itr5) == FALSE){
                         flag_mate2 = FALSE;
-                        printf("Apparently False \n");
                         break;
                     }else{
                         flag_mate2 = TRUE;
@@ -333,7 +330,7 @@ An opponent move makes us unable to mate in 1... */
             itr3 = itr3->next_move;
         }
     }
-    freeing_list(moves3);
+    /*freeing_list(moves3); */
     restore_state5();
     return FALSE;
 

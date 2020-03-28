@@ -1056,7 +1056,7 @@ Bool is_checkmate(PlayerColor c) {
 
 			return TRUE;
 		}
-		freeing_list(moves);
+		/*freeing_list(moves); */
 
 		restore_state();
 		/*
@@ -1109,7 +1109,7 @@ Bool is_draw() {
 
  			return TRUE;
  		}
-		freeing_list(moves);
+		/*freeing_list(moves); */
 	}
 
 	return FALSE;
