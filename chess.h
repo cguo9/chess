@@ -108,7 +108,7 @@ Bool matein2(Move *soln);
 /* Given a position, find a mate in 1. */
 Bool run_mate1(Move *soln);
 
-void freeing_list(Move *head);
+void freeing_list(Move **head);
 
 /* temp global variables to save/load state with */
 extern Pos temp_ep_square;

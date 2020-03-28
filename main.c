@@ -239,7 +239,6 @@ Bool existmate1(PlayerColor c) {
     unsigned int count;
     Move *itr = NULL;
     Bool mate_in_1_flag = FALSE;
-    
 
 
     if(legal_moves(&moves, c, &count)) {
@@ -253,16 +252,17 @@ Bool existmate1(PlayerColor c) {
             }
             if(run_mate1(itr)) {
                 mate_in_1_flag = TRUE;
+		/*freeing_list(&moves); */
                 return TRUE;
             }
-	   /* temp = itr; */
-            itr = itr->next_move;
-	   /* free(temp); */
+	  
+            itr = itr->next_move; 
             restore_state4();
         }
     } else {
         return FALSE;
     }
+    /*freeing_list(&moves); */
     return mate_in_1_flag;
 }
 
@@ -317,11 +317,11 @@ Bool run_mate2(Move *soln) {
 }
 
 
-void freeing_list(Move *head){
+void freeing_list(Move **head){
     Move* temp;
-    while (head != NULL){
-       temp = head;
-       head = head->next_move;
+    while ((*head) != NULL){
+       temp = (*head);
+       *head = (*head)->next_move;
        free(temp);
     }
 
