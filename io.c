@@ -216,31 +216,50 @@ Bool parse_board(char *board) { /* DOES NOT PARSE THE MODE YET */
                  player[BLACK].castle_flags = NO_CASTLE;
                  continue;
              }else if(read_c == 'K'){
-                 if(!( (IS_SET(player[CurrentPlayer].k, WKING_START_POS)) && (IS_SET(player[CurrentPlayer].r, 63)) ) ){
+                 /*if(!( (IS_SET(player[CurrentPlayer].k, WKING_START_POS)) && (IS_SET(player[CurrentPlayer].r, 63)) ) ){
                       printf("castling white Kingside");
                      return FALSE;
+                 }*/
+                 if((IS_SET(player[WHITE].k, WKING_START_POS) == 0) || (IS_SET(player[WHITE].r, 63) == 0)){
+                     printf("kingside; no white king or rook");
+                     return FALSE;
                  }
+
                  player[WHITE].castle_flags = CASTLE_KING;
                  continue;
              }else if(read_c == 'Q'){
-                 if(!( (IS_SET(player[CurrentPlayer].k, WKING_START_POS)) && (IS_SET(player[CurrentPlayer].r, 56)) ) ){
+                /* if(!( (IS_SET(player[CurrentPlayer].k, WKING_START_POS)) && (IS_SET(player[CurrentPlayer].r, 56)) ) ){
                      printf("castling white qside");
+                     return FALSE;
+                 }*/
+                 if((IS_SET(player[WHITE].k, WKING_START_POS) == 0) || (IS_SET(player[WHITE].r, 56) == 0)){
+                     printf("queenside; no white king or rook");
                      return FALSE;
                  }
                  player[WHITE].castle_flags = CASTLE_QUEEN;
                  continue;
              }else if(read_c == 'k'){
-                 if(!( (IS_SET(player[CurrentPlayer].k, BKING_START_POS)) && (IS_SET(player[CurrentPlayer].r, 7)) ) ){
+                 /*if(!( (IS_SET(player[CurrentPlayer].k, BKING_START_POS)) && (IS_SET(player[CurrentPlayer].r, 7)) ) ){
                      printf("castling black Kingside");
                      return FALSE;
+                 }*/
+                 if((IS_SET(player[BLACK].k, BKING_START_POS) == 0) || (IS_SET(player[BLACK].r, 7) == 0)){
+                     printf("kingnside; no black king or rook");
+                     return FALSE;
                  }
+
                  player[BLACK].castle_flags = CASTLE_KING;
                  continue;
              }else if(read_c == 'q'){
-                 if(!( (IS_SET(player[CurrentPlayer].k, BKING_START_POS)) && (IS_SET(player[CurrentPlayer].r, 0)) ) ){
+                 /*if(!( (IS_SET(player[CurrentPlayer].k, BKING_START_POS)) && (IS_SET(player[CurrentPlayer].r, 0)) ) ){
                      printf("castling black qside");
                      return FALSE;
+                 }*/
+                 if((IS_SET(player[BLACK].k, BKING_START_POS) == 0) || (IS_SET(player[BLACK].r, 0) == 0)){
+                     printf("kingside; no black king or rook");
+                     return FALSE;
                  }
+
                  player[BLACK].castle_flags = CASTLE_QUEEN;
                  continue;
              }
