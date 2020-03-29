@@ -249,7 +249,7 @@ Bool existmate1(PlayerColor c) {
             }
             if(run_mate1(itr)) {
                 mate_in_1_flag = TRUE;
-		/*freeing_list(&moves);*/ 
+		freeing_list(&moves); 
                 return TRUE;
             }
 	  
@@ -259,7 +259,7 @@ Bool existmate1(PlayerColor c) {
     } else {
         return FALSE;
     }
-    /* freeing_list(&moves); */
+    freeing_list(&moves); 
     return mate_in_1_flag;
 }
 

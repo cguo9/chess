@@ -1065,7 +1065,7 @@ Bool is_checkmate(PlayerColor c) {
 		} */
 		
 		
-		/* freeing_list(&moves); */ 
+		freeing_list(&moves);
 
 		restore_state();
 		/*
