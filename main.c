@@ -321,7 +321,8 @@ Bool run_mate2(Move *soln) {
                 /*display_board();
                 printf("No mate in 1\n"); */
                 mate2_flag = FALSE;
-                return FALSE;
+                freeing_list(&head);
+		return FALSE;
             }
             restore_state7();
 	   /* temp = itr;*/
