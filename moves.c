@@ -715,6 +715,7 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					temp->to = i;
 					temp->piece = KING;
 					temp->promotion_choice = UNKNOWN;
+					temp->next_move = NULL;
 					make_move(temp, c); /* need to restore since we're not actually moving here*/
 					if(king_is_checked(i, c) == TRUE) {
 					/* every other piece uses king_is_checked(king_pos,c) */
@@ -772,6 +773,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						temp->to = i;
 						temp->piece = PAWN;
 						temp->promotion_choice = UNKNOWN;
+						temp->next_move = NULL;
+
 						make_move(temp, c); /* need to restore since we're not actually moving here*/
 						if(king_is_checked(king_pos, c) == TRUE) {
 							restore_state();
@@ -798,6 +801,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						temp->to = i;
 						temp->piece = PAWN;
 						temp->promotion_choice = ROOK;
+						temp->next_move = NULL;
+
 						make_move(temp, c); /* need to restore since we're not actually moving here*/
 						if(king_is_checked(king_pos, c) == TRUE) {
 							restore_state();
@@ -826,6 +831,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						temp2->to = i;
 						temp2->piece = PAWN;
 						temp2->promotion_choice = NIGHT;
+						temp2->next_move = NULL;
+
 						make_move(temp2, c);
 						(*pcount)++;
 						/* printf("pcount incr in p2\n"); */
@@ -844,6 +851,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						temp3->to = i;
 						temp3->piece = PAWN;
 						temp3->promotion_choice = BISHOP;
+						temp3->next_move = NULL;
+
 						make_move(temp3, c);
 						(*pcount)++;
 
@@ -862,6 +871,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 						temp4->to = i;
 						temp4->piece = PAWN;
 						temp4->promotion_choice = QUEEN;
+						temp4->next_move = NULL;
+
 						make_move(temp4, c);
 						(*pcount)++;
 						/* printf("pcount incr in p4\n");*/
@@ -891,6 +902,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					temp->to = i;
 					temp->piece = ROOK;
 					temp->promotion_choice = UNKNOWN;
+					temp->next_move = NULL;
+
 					make_move(temp, c); /* need to restore since we're not actually moving here*/
 					if(king_is_checked(king_pos, c) == TRUE) {
 					/* every other piece uses king_is_checked(king_pos,c) */
@@ -927,6 +940,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					temp->to = i;
 					temp->piece = NIGHT;
 					temp->promotion_choice = UNKNOWN;
+					temp->next_move = NULL;
+
 					make_move(temp, c); /* need to restore since we're not actually moving here*/
 					if(king_is_checked(king_pos, c) == TRUE) {
 					/* every other piece uses king_is_checked(king_pos,c) */
@@ -963,6 +978,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					temp->to = i;
 					temp->piece = BISHOP;
 					temp->promotion_choice = UNKNOWN;
+					temp->next_move = NULL;
+
 					make_move(temp, c); /* need to restore since we're not actually moving here*/
 					if(king_is_checked(king_pos, c) == TRUE) {
 					/* every other piece uses king_is_checked(king_pos,c) */
@@ -998,6 +1015,8 @@ Bool legal_moves(Move **m, PlayerColor c, unsigned int *pcount) {
 					temp->to = i;
 					temp->piece = QUEEN;
 					temp->promotion_choice = UNKNOWN;
+					temp->next_move = NULL;
+
 					make_move(temp, c); /* need to restore since we're not actually moving here*/
 					if(king_is_checked(king_pos, c) == TRUE) {
 					/* every other piece uses king_is_checked(king_pos,c) */
