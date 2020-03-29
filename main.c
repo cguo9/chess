@@ -80,11 +80,31 @@ int main(int argc, char const *argv[]) {
   			printf("Castle flags for WHITE PLAYER: %d\n", player[WHITE].castle_flags);
   			printf("Castle flags for BLACK PLAYER: %d\n", player[BLACK].castle_flags);
   			printf("En Passant square: %d\n", ep_square);
-  			printf("done parsing.\n");
   			/*return 0; testing purposes */
   		}else{
-  			printf("Error parsing input.\n");
-  			return 0;
+            FILE *fptr2 = fopen(solutions, "a");
+            if(fptr2 == NULL){
+                printf("Error opening file\n");
+                return 0;
+            }
+            fprintf(fptr2, "%s\n","Not found");
+            fclose(fptr2);
+            memset(board_str, 0, 150); /* reset everything for next puzzle */
+    		int z;
+      		for(z = 0; z < 2; z++){
+      			player[z].r &= 0;
+      			player[z].n &= 0;
+      			player[z].b &= 0;
+      			player[z].q &= 0;
+      			player[z].k &= 0;
+      			player[z].p &= 0;
+      			player[z].castle_flags = NO_CASTLE;
+      		}
+      		/* probably not necessary since theyre gonna be overwritten */
+      		ep_square = 0;
+      		CurrentPlayer = 0;
+      		mode = 0;
+  			continue;
   		}
 
         /*Move *moves = NULL;
@@ -104,7 +124,7 @@ int main(int argc, char const *argv[]) {
 
 /* NEED TO FREE THIS LINKED LIST BEFORE PARSING NEXT BOARD */
 
-        printf("================ Making moves and determining if checkmate ==============\n");
+        /*printf("================ Making moves and determining if checkmate ==============\n");*/
         /* temporarily, actually suppsoed to be argv[3]*/
         mode = atoi(argv[3]);
         Bool found_sol = FALSE;
@@ -148,7 +168,7 @@ int main(int argc, char const *argv[]) {
                     printf("Error opening file\n");
                     return 0;
                 }
-                fprintf(fptr2, "%d\n", 0);
+                fprintf(fptr2, "%s\n", "Not found");
                 fclose(fptr2);
             }
         }else if(mode == 2){
@@ -176,9 +196,9 @@ int main(int argc, char const *argv[]) {
                     }
                     restore_state2();
                     itr = itr->next_move;
-                }      
+                }
             }
-            freeing_list(&head); 
+            freeing_list(&head);
             if(found_sol == FALSE) {
                 printf("\ncannot find run_mate2 solution.\n");
                 FILE *fptr2 = fopen(solutions, "a");
@@ -186,7 +206,7 @@ int main(int argc, char const *argv[]) {
                     printf("Error opening file\n");
                     return 0;
                 }
-                fprintf(fptr2, "%d\n", 0);
+                fprintf(fptr2, "%s\n", "Not found");
                 fclose(fptr2);
             }
         }else{
@@ -249,17 +269,17 @@ Bool existmate1(PlayerColor c) {
             }
             if(run_mate1(itr)) {
                 mate_in_1_flag = TRUE;
-		freeing_list(&moves); 
+		freeing_list(&moves);
                 return TRUE;
             }
-	  
-            itr = itr->next_move; 
+
+            itr = itr->next_move;
             restore_state4();
         }
     } else {
         return FALSE;
     }
-    freeing_list(&moves); 
+    freeing_list(&moves);
     return mate_in_1_flag;
 }
 
