@@ -151,9 +151,6 @@ int main(int argc, char const *argv[]) {
                 fprintf(fptr2, "%d\n", 0);
                 fclose(fptr2);
             }
-            /* while(moves != NULL){
-                freeing_list(moves);
-            } */
         }else if(mode == 2){
             Move *moves = NULL;
             unsigned int count = 0;
@@ -178,11 +175,8 @@ int main(int argc, char const *argv[]) {
                         break;
                     }
                     restore_state2();
-		    /*temp = itr;*/
                     itr = itr->next_move;
-		    /*free(temp);*/
                 }      
-	       /*free(itr);*/	
             }
             freeing_list(&head); 
             if(found_sol == FALSE) {
@@ -262,11 +256,10 @@ Bool existmate1(PlayerColor c) {
             itr = itr->next_move; 
             restore_state4();
         }
-	/*freeing_list(&moves);*/
     } else {
         return FALSE;
     }
-    /*freeing_list(&moves); */
+    /* freeing_list(&moves); */
     return mate_in_1_flag;
 }
 
@@ -310,8 +303,8 @@ Bool run_mate2(Move *soln) {
                 mate2_flag = FALSE;
                 return FALSE;
             }
-           /* restore_state7();
-	    temp = itr;*/
+            restore_state7();
+	   /* temp = itr;*/
             itr = itr->next_move;
 	    /*free(temp);*/
         }

@@ -1,3 +1,4 @@
-4Q3/2p5/3p4/3k4/K4R2/5P2/8/8 w - -
-r5k1/5ppp/2R5/5Q2/8/8/8/7K w - -
-8/4B3/6K1/8/8/2Q3Pk/4R1nN/8 w - -
+2bqkbn1/2pppp2/np2N3/r3P1p1/p2N2B1/5Q2/PPPPKPP1/RNB2r2 w - -
+8/6K1/1p1B1RB1/8/2Q5/2n1kP1N/3b4/4n3 w - -
+B7/K1B1p1Q1/5r2/7p/1P1kp1bR/3P3R/1P1NP3/2n5 w - -
+
