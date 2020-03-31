@@ -310,7 +310,7 @@ Bool run_mate2(Move *soln) {
             save_state7();
             /*rintf("OPPONENT MOVE PIECE:%d  MOVE: %u - %u  ||  Promotion: %d\n", (int)itr->piece, itr->from, itr->to,
                    (int)itr->promotion_choice); */
-            if(detect_castle_move(itr, 1-CurrentPlayer), 1-CurrentPlayer) {
+            if(detect_castle_move(itr, 1-CurrentPlayer)) {
                 perform_castle(detect_castle_move(itr, 1 - CurrentPlayer), 1 - CurrentPlayer);
             } else {
                 make_move(itr, 1-CurrentPlayer);
