@@ -1,4 +1,5 @@
 # Chess - Solving Checkmate Puzzles
+<br/>
 
 ## Introduction
 A fully functiona chess engine capable of solving mate-in-1 and mate-in-2 chess puzzles. Given a intial chess board with both black and white chess pieces in place, as well as information about castling and en-passant moves and the player to move, the program will determine the correct move that the player can make to deliver a checkmate in one move or a checkmate in two moves depending on the mode in which the program is run in. A checkmate in two moves includes finding a move such that irrespective of what the opponent moves, there is a valid checkmate in one move on the next turn.
@@ -64,7 +65,7 @@ $make all
 ```bash
 $./chess puzzles.txt solution.txt <mode>
 ```
-Where <mode> is replaced with either a 1 or 2 representing mate-in-1 and mate-in-2, respectively. The puzzle.txt file contains the input string and the program will output the solution to solution.txt using the mate-in-1 function if the mode is specified as 1 or mate-in-2 if the mode is 2.
+Where "mode" is replaced with either a 1 or 2 representing mate-in-1 and mate-in-2, respectively. The puzzle.txt file contains the input string and the program will output the solution to solution.txt using the mate-in-1 function if the mode is specified as 1 or mate-in-2 if the mode is 2.
 
 You may replace "puzzles.txt" with your own text file containing an input string in the proper format on each line. The program outputs the solution(s) to the puzzle strings into the "solution.txt" file or any other file you specify. If the file does not exist, the program will create a new one and append the solutions to that file.
 
